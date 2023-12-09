@@ -19,3 +19,6 @@
   background-position: -3.2px -3.2px, -3.2px -3.2px, -1.6px -1.6px,
     -1.6px -1.6px;
 }
+
+html, body { height: 100%; }
+body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }

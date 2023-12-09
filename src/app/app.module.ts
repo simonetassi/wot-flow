@@ -6,7 +6,11 @@ import { CustomSocketComponent } from './customization/custom-socket/custom-sock
 import { CustomNodeComponent } from './customization/custom-node/custom-node.component';
 import { CustomConnectionComponent } from './customization/custom-connection/custom-connection.component';
 
+import {MatButtonModule} from '@angular/material/button'; 
+import {MatIconModule} from '@angular/material/icon';
+
 import { ReteModule } from 'rete-angular-plugin/14';
+import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 
 @NgModule({
   declarations: [
@@ -15,7 +19,7 @@ import { ReteModule } from 'rete-angular-plugin/14';
     CustomNodeComponent,
     CustomConnectionComponent,
   ],
-  imports: [BrowserModule, ReteModule],
+  imports: [BrowserModule, ReteModule, BrowserAnimationsModule, MatButtonModule, MatIconModule],
   providers: [],
   bootstrap: [AppComponent],
 })
