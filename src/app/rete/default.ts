@@ -23,6 +23,8 @@ import {
    DockPresets 
 } from "rete-dock-plugin";
 
+import { DataService } from '../data.service';
+
 type Node = NumberNode | AddNode;
 type Conn =
   | Connection<NumberNode, AddNode>
@@ -105,7 +107,7 @@ const socket = new Classic.Socket('socket');
 
 
 
-export async function createEditor(container: HTMLElement, injector: Injector) {
+export async function createEditor(container: HTMLElement, injector: Injector, dataService: DataService) {
   const editor = new NodeEditor<Schemes>();
   const area = new AreaPlugin<Schemes, AreaExtra>(container);
   const connection = new ConnectionPlugin<Schemes, AreaExtra>();
@@ -120,6 +122,12 @@ export async function createEditor(container: HTMLElement, injector: Injector) {
       ['Add', () => new AddNode()],
     ]),
   });
+
+  dataService.getThings().subscribe(
+    (data) => {
+      console.log(data);
+    }
+  );
 
   dock.addPreset(DockPresets.classic.setup({ area, size: 100, scale: 0.6 }));
 

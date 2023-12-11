@@ -12,6 +12,8 @@ import {MatIconModule} from '@angular/material/icon';
 import { ReteModule } from 'rete-angular-plugin/14';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 
+import { HttpClientModule } from '@angular/common/http';
+
 @NgModule({
   declarations: [
     AppComponent,
@@ -19,7 +21,7 @@ import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
     CustomNodeComponent,
     CustomConnectionComponent,
   ],
-  imports: [BrowserModule, ReteModule, BrowserAnimationsModule, MatButtonModule, MatIconModule],
+  imports: [BrowserModule, ReteModule, BrowserAnimationsModule, MatButtonModule, MatIconModule, HttpClientModule],
   providers: [],
   bootstrap: [AppComponent],
 })
