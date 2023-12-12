@@ -51,14 +51,16 @@
     height: 59rem;
     font-size: 1rem;
     background: white;
+    border-radius: 1em;
     text-align: center;
-    display: flex;
-    justify-content: flex-end;
-    align-items: flex-start;
   }
 
   .fab {
+    position: absolute;
+    top: 0;
+    right: 0;
     margin: 1rem;
+    z-index: 1;
   }
 
   /* Aggiungi media queries */
@@ -75,15 +77,21 @@
     }
 
     .rete {
+      position: relative;
       width: 100%;
       height: 50rem;
       font-size: 1rem;
       background: white;
+      border-radius: 1em;
       text-align: center;
     }
 
     .fab {
+      position: absolute;
+      top: 0;
+      right: 0;
       margin: 1rem;
+      z-index: 1;
     }
   }
 
@@ -100,21 +108,25 @@
     }
 
     .rete {
+      position: relative;
       width: 100%;
       height: 23.5rem;
       font-size: 1rem;
       background: white;
+      border-radius: 1em;
       text-align: center;
-      overflow: auto;
     }
 
     .fab {
+      position: absolute;
+      top: 0;
+      right: 0;
       margin: 1rem;
+      z-index: 1;
     }
   }
 </style>
-<div class="rete" role="main" #rete>
-  <button mat-fab color="primary" class="mat-elevation-z0 fab">
-    <mat-icon>done</mat-icon>
-  </button>
-</div>
+<button mat-fab color="primary" class="mat-elevation-z0 fab">
+  <mat-icon>done</mat-icon>
+</button>
+<div class="rete" role="main" #rete></div>

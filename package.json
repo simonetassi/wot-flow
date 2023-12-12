@@ -22,11 +22,15 @@
     "@angular/platform-browser-dynamic": "^14.2.0",
     "@angular/router": "^14.2.0",
     "@material/web": "^1.0.1",
+    "@node-wot/binding-http": "^0.8.10",
+    "@node-wot/core": "^0.8.10",
     "@types/three": "^0.156.0",
+    "elkjs": "^0.8.2",
     "rete": "^2.0.2",
     "rete-angular-plugin": "^2.0.2",
     "rete-area-3d-plugin": "^2.0.3",
     "rete-area-plugin": "^2.0.1",
+    "rete-auto-arrange-plugin": "^2.0.0",
     "rete-connection-plugin": "^2.0.0",
     "rete-context-menu-plugin": "^2.0.0",
     "rete-dock-plugin": "^2.0.0",
@@ -34,6 +38,7 @@
     "rxjs": "~7.5.0",
     "three": "^0.156.1",
     "tslib": "^2.3.0",
+    "web-worker": "^1.2.0",
     "zone.js": "~0.11.4"
   },
   "devDependencies": {

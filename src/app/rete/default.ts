@@ -1,4 +1,4 @@
-import { ClassicPreset as Classic, GetSchemes, NodeEditor } from 'rete';
+import { ClassicPreset as Classic, ClassicPreset, GetSchemes, NodeEditor } from 'rete';
 import { Injector } from '@angular/core';
 import { Area2D, AreaExtensions, AreaPlugin } from 'rete-area-plugin';
 import {
@@ -13,23 +13,15 @@ import {
 } from 'rete-angular-plugin/14';
 
 import {
-  ContextMenuPlugin,
-  ContextMenuExtra,
-  Presets as ContextMenuPresets,
-} from 'rete-context-menu-plugin';
-
-import {
-   DockPlugin,
-   DockPresets 
+  DockPlugin,
+  DockPresets
 } from "rete-dock-plugin";
 
 import { DataService } from '../data.service';
+import { restrictor } from 'rete-area-plugin/_types/extensions';
 
-type Node = NumberNode | AddNode;
+type Node = ThingNode | ActionNode | PropertyNode;
 type Conn =
-  | Connection<NumberNode, AddNode>
-  | Connection<AddNode, AddNode>
-  | Connection<AddNode, NumberNode>
   | Connection<ThingNode, PropertyNode>
   | Connection<ThingNode, ActionNode>;
 type Schemes = GetSchemes<Node, Conn>;
@@ -38,32 +30,6 @@ class Connection<A extends Node, B extends Node> extends Classic.Connection<
   A,
   B
 > { }
-
-class NumberNode extends Classic.Node {
-  constructor(initial: number, change?: (value: number) => void) {
-    super('Number');
-
-    this.addOutput('value', new Classic.Output(socket, 'Number'));
-    this.addControl(
-      'value',
-      new Classic.InputControl('number', { initial, change })
-    );
-  }
-}
-
-class AddNode extends Classic.Node {
-  constructor() {
-    super('Add');
-
-    this.addInput('a', new Classic.Input(socket, 'A'));
-    this.addInput('b', new Classic.Input(socket, 'B'));
-    this.addOutput('value', new Classic.Output(socket, 'Number'));
-    this.addControl(
-      'result',
-      new Classic.InputControl('number', { initial: 0, readonly: true })
-    );
-  }
-}
 
 class ThingNode extends Classic.Node {
   width = 180;
@@ -74,6 +40,7 @@ class ThingNode extends Classic.Node {
 
     this.addInput('in', new Classic.Input(socket));
     this.addOutput('value', new Classic.Output(socket));
+    return this;
   }
 }
 
@@ -86,6 +53,7 @@ class PropertyNode extends Classic.Node {
 
     this.addInput('in', new Classic.Input(socket));
     this.addOutput('value', new Classic.Output(socket));
+    return this;
   }
 }
 
@@ -98,14 +66,13 @@ class ActionNode extends Classic.Node {
 
     this.addInput('in', new Classic.Input(socket));
     this.addOutput('value', new Classic.Output(socket));
+    return this;
   }
 }
 
-type AreaExtra = Area2D<Schemes> | AngularArea2D<Schemes> | ContextMenuExtra;
+type AreaExtra = Area2D<Schemes> | AngularArea2D<Schemes>;
 
 const socket = new Classic.Socket('socket');
-
-
 
 export async function createEditor(container: HTMLElement, injector: Injector, dataService: DataService) {
   const editor = new NodeEditor<Schemes>();
@@ -115,19 +82,6 @@ export async function createEditor(container: HTMLElement, injector: Injector, d
   const angularRender = new AngularPlugin<Schemes, AreaExtra>({ injector });
 
   const dock = new DockPlugin<Schemes>();
-
-  const contextMenu = new ContextMenuPlugin<Schemes>({
-    items: ContextMenuPresets.classic.setup([
-      ['Number', () => new NumberNode(1)],
-      ['Add', () => new AddNode()],
-    ]),
-  });
-
-  dataService.getThings().subscribe(
-    (data) => {
-      console.log(data);
-    }
-  );
 
   dock.addPreset(DockPresets.classic.setup({ area, size: 100, scale: 0.6 }));
 
@@ -140,28 +94,38 @@ export async function createEditor(container: HTMLElement, injector: Injector, d
   area.use(angularRender);
 
   area.use(connection);
-  area.use(contextMenu);
 
   area.use(dock);
 
   connection.addPreset(ConnectionPresets.classic.setup());
 
   angularRender.addPreset(AngularPresets.classic.setup());
-  angularRender.addPreset(AngularPresets.contextMenu.setup());
 
-  dock.add(() => new ThingNode("Sensor"));
-  dock.add(() => new ThingNode("Gas Sensor"));
-  dock.add(() => new ActionNode("openDoor()"));
-  dock.add(() => new ActionNode("getTemperature()"));
+  // TODO move in another file
 
-  AreaExtensions.zoomAt(area, editor.getNodes());
+  dataService.getThings().subscribe(
+    (data) => {
+      data.forEach((element: any) => {
+        dock.add(() => new ThingNode(element.title));
 
-  const selector = AreaExtensions.selector();
-  const accumulating = AreaExtensions.accumulateOnCtrl();
+        Object.entries(element.actions).forEach((action: any) => {
+          dock.add(() => new ActionNode(action[0]));
+        });
 
-  AreaExtensions.selectableNodes(area, selector, { accumulating });
+        Object.entries(element.properties).forEach((property: any) => {
+          dock.add(() => new PropertyNode(property[0]));
+        });
+      });
+    }
+  );
+  // TODO end
+
+  AreaExtensions.restrictor(area, {
+    scaling: () => ({ min: 0.4, max: 1 }),
+    translation: () => ({ left: 0, top: 0, right: 300, bottom: 300 })
+  });
 
   return {
-    destroy: () => area.destroy(),
+    destroy: () => area.destroy()
   };
 }
