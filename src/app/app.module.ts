@@ -13,6 +13,10 @@ import { ReteModule } from 'rete-angular-plugin/14';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 
 import { HttpClientModule } from '@angular/common/http';
+import { ActionNodeComponent } from './customization/nodes/action-node/action-node.component';
+import { PropertyNodeComponent } from './customization/nodes/property-node/property-node.component';
+import { ThingNodeComponent } from './customization/nodes/thing-node/thing-node.component';
+
 
 @NgModule({
   declarations: [
@@ -20,6 +24,9 @@ import { HttpClientModule } from '@angular/common/http';
     CustomSocketComponent,
     CustomNodeComponent,
     CustomConnectionComponent,
+    ActionNodeComponent,
+    PropertyNodeComponent,
+    ThingNodeComponent,
   ],
   imports: [BrowserModule, ReteModule, BrowserAnimationsModule, MatButtonModule, MatIconModule, HttpClientModule],
   providers: [],

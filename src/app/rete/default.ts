@@ -4,6 +4,7 @@ import { Area2D, AreaExtensions, AreaPlugin } from 'rete-area-plugin';
 import {
   ConnectionPlugin,
   Presets as ConnectionPresets,
+  Presets,
 } from 'rete-connection-plugin';
 
 import {
@@ -17,8 +18,18 @@ import {
   DockPresets
 } from "rete-dock-plugin";
 
+import {
+  ContextMenuPlugin,
+  ContextMenuExtra,
+  Presets as ContextMenuPresets,
+} from 'rete-context-menu-plugin';
+
 import { DataService } from '../data.service';
 import { restrictor } from 'rete-area-plugin/_types/extensions';
+import { CustomNodeComponent } from '../customization/custom-node/custom-node.component';
+import { ActionNodeComponent } from '../customization/nodes/action-node/action-node.component';
+import { PropertyNodeComponent } from '../customization/nodes/property-node/property-node.component';
+import { ThingNodeComponent } from '../customization/nodes/thing-node/thing-node.component';
 
 type Node = ThingNode | ActionNode | PropertyNode;
 type Conn =
@@ -36,7 +47,7 @@ class ThingNode extends Classic.Node {
   height = 120;
 
   constructor(initial: string, id?: string) {
-    super("Thing: " + initial);
+    super(initial);
 
     this.addInput('in', new Classic.Input(socket));
     this.addOutput('value', new Classic.Output(socket));
@@ -49,7 +60,7 @@ class PropertyNode extends Classic.Node {
   height = 120;
 
   constructor(initial: string) {
-    super("Property: " + initial);
+    super(initial);
 
     this.addInput('in', new Classic.Input(socket));
     this.addOutput('value', new Classic.Output(socket));
@@ -62,7 +73,7 @@ class ActionNode extends Classic.Node {
   height = 120;
 
   constructor(initial: string) {
-    super("Action: " + initial);
+    super(initial);
 
     this.addInput('in', new Classic.Input(socket));
     this.addOutput('value', new Classic.Output(socket));
@@ -70,7 +81,7 @@ class ActionNode extends Classic.Node {
   }
 }
 
-type AreaExtra = Area2D<Schemes> | AngularArea2D<Schemes>;
+type AreaExtra = Area2D<Schemes> | AngularArea2D<Schemes> | ContextMenuExtra; 
 
 const socket = new Classic.Socket('socket');
 
@@ -81,7 +92,27 @@ export async function createEditor(container: HTMLElement, injector: Injector, d
 
   const angularRender = new AngularPlugin<Schemes, AreaExtra>({ injector });
 
+  const contextMenu = new ContextMenuPlugin<Schemes>({
+    items: ContextMenuPresets.classic.setup([
+    ]),
+  });
+
   const dock = new DockPlugin<Schemes>();
+
+  angularRender.addPreset(
+    AngularPresets.classic.setup({
+      customize: {
+        node(context) {
+          if (context.payload instanceof ActionNode) {
+            return ActionNodeComponent;
+          } else if (context.payload instanceof PropertyNode){
+            return PropertyNodeComponent;
+          }
+          return ThingNodeComponent;
+        }
+      },
+    })
+  );
 
   dock.addPreset(DockPresets.classic.setup({ area, size: 100, scale: 0.6 }));
 
@@ -94,12 +125,14 @@ export async function createEditor(container: HTMLElement, injector: Injector, d
   area.use(angularRender);
 
   area.use(connection);
+  area.use(contextMenu);
 
   area.use(dock);
 
   connection.addPreset(ConnectionPresets.classic.setup());
 
   angularRender.addPreset(AngularPresets.classic.setup());
+  angularRender.addPreset(AngularPresets.contextMenu.setup());
 
   // TODO move in another file
 
