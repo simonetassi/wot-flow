@@ -1,0 +1,37 @@
+.thing-btn {
+    background-color: rgba(251, 192, 147, 1);
+    margin: 0.3rem;
+}
+
+.action-btn {
+    background-color: rgba(110, 136, 255, 0.8);
+    margin: 0.3rem;
+    color: white;
+}
+
+.property-btn {
+    background-color: rgba(201, 242, 155, 1);
+    margin: 0.3rem;
+}
+
+.btn-container {
+    align-items: center;
+}
+
+.panel {
+    width: 15rem;
+}
+
+@media only screen and (min-device-height: 414px) and (max-device-height: 896px) and (orientation: portrait) {
+    /* Mobile portrait styles */
+    .panel {
+        width: 12rem;
+    }
+}
+
+@media only screen and (min-device-width: 414px) and (max-device-width: 896px) and (orientation: landscape) {
+    /* Mobile landscape styles */
+    .panel {
+        width: 15rem;
+    }
+}

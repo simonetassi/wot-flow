@@ -6,16 +6,26 @@ import { CustomSocketComponent } from './customization/custom-socket/custom-sock
 import { CustomNodeComponent } from './customization/custom-node/custom-node.component';
 import { CustomConnectionComponent } from './customization/custom-connection/custom-connection.component';
 
-import {MatButtonModule} from '@angular/material/button'; 
-import {MatIconModule} from '@angular/material/icon';
+import { MatButtonModule } from '@angular/material/button';
+import { MatIconModule } from '@angular/material/icon';
+
+import { MatSidenavModule } from '@angular/material/sidenav';
+import { MatToolbarModule } from '@angular/material/toolbar';
+
+import { MatMenuModule } from '@angular/material/menu';
+import { MatListModule } from '@angular/material/list';
+import { MatExpansionModule } from '@angular/material/expansion';
+
 
 import { ReteModule } from 'rete-angular-plugin/14';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 
 import { HttpClientModule } from '@angular/common/http';
+
 import { ActionNodeComponent } from './customization/nodes/action-node/action-node.component';
 import { PropertyNodeComponent } from './customization/nodes/property-node/property-node.component';
 import { ThingNodeComponent } from './customization/nodes/thing-node/thing-node.component';
+import { ThingExpandableComponent } from './thing-expandable/thing-expandable.component';
 
 
 @NgModule({
@@ -27,9 +37,11 @@ import { ThingNodeComponent } from './customization/nodes/thing-node/thing-node.
     ActionNodeComponent,
     PropertyNodeComponent,
     ThingNodeComponent,
+    ThingExpandableComponent,
   ],
-  imports: [BrowserModule, ReteModule, BrowserAnimationsModule, MatButtonModule, MatIconModule, HttpClientModule],
+  imports: [BrowserModule, ReteModule, BrowserAnimationsModule, MatButtonModule, MatIconModule, MatSidenavModule,
+    MatToolbarModule, MatMenuModule, MatListModule, MatExpansionModule, HttpClientModule],
   providers: [],
   bootstrap: [AppComponent],
 })
-export class AppModule {}
+export class AppModule { }

@@ -1,7 +1,6 @@
-import { AfterViewInit, Component, ElementRef, Injector, ViewChild } from '@angular/core'
+import { AfterViewInit, Component, ElementRef, Injector, ViewChild, Renderer2 } from '@angular/core'
 
 import { createEditor } from './rete'
-import { DataService } from './data.service'
 
 @Component({
   selector: 'app-root',
@@ -12,9 +11,9 @@ export class AppComponent implements AfterViewInit {
   title = 'angular'
   @ViewChild('rete') container!: ElementRef<HTMLElement>
 
-  constructor(private injector: Injector, private dataService: DataService) { }
+  constructor(private injector: Injector) { }
 
   async ngAfterViewInit() {
-    await createEditor(this.container.nativeElement, this.injector, this.dataService);
+    await createEditor(this.container.nativeElement, this.injector);
   }
 }
