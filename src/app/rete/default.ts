@@ -14,11 +14,6 @@ import {
 } from 'rete-angular-plugin/14';
 
 import {
-  DockPlugin,
-  DockPresets
-} from "rete-dock-plugin";
-
-import {
   ContextMenuPlugin,
   ContextMenuExtra,
   Presets as ContextMenuPresets,
@@ -91,7 +86,6 @@ export async function createEditor(container: HTMLElement, injector: Injector) {
     items: ContextMenuPresets.classic.setup([
     ]),
   });
-  const dock = new DockPlugin<Schemes>();
 
   // nodes customization
   angularRender.addPreset(
@@ -109,8 +103,6 @@ export async function createEditor(container: HTMLElement, injector: Injector) {
     })
   );
 
-  dock.addPreset(DockPresets.classic.setup({ area, size: 100, scale: 0.6 }));
-
   AreaExtensions.selectableNodes(area, AreaExtensions.selector(), {
     accumulating: AreaExtensions.accumulateOnCtrl()
   });
@@ -120,40 +112,16 @@ export async function createEditor(container: HTMLElement, injector: Injector) {
   area.use(angularRender);
   area.use(connection);
   area.use(contextMenu);
-  // area.use(dock);
 
   connection.addPreset(ConnectionPresets.classic.setup());
 
   angularRender.addPreset(AngularPresets.classic.setup());
   angularRender.addPreset(AngularPresets.contextMenu.setup());
 
-  // http get from zion
-  // dataService.getThings().subscribe(
-  //   (data) => {
-  //     data.forEach((element: any) => {
-  //       dock.add(() => new ThingNode(element.title));
-
-  //       Object.entries(element.actions).forEach((action: any) => {
-  //         dock.add(() => new ActionNode(action[0]));
-  //       });
-
-  //       Object.entries(element.properties).forEach((property: any) => {
-  //         dock.add(() => new PropertyNode(property[0]));
-  //       });
-  //     });
-  //   }
-  // );
-
   AreaExtensions.restrictor(area, {
     scaling: () => ({ min: 0.4, max: 1 }),
     translation: () => ({ left: 0, top: 0, right: 300, bottom: 300 })
   });
-
-  const saveBtn = document.getElementById("saveBtn");
-  saveBtn?.addEventListener('click', (event) => {
-    createAndroidCode(editor.getNodes())
-  })
-
 
   return {
     destroy: () => area.destroy()
@@ -172,6 +140,6 @@ export async function addPropertyNode(propertyName: string) {
   await editor.addNode(new PropertyNode(propertyName));
 }
 
-function createAndroidCode(nodes: any) {
+export function createAndroidCode() {
   console.log("createAndroidCode!");
  }

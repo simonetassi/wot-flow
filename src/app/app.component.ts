@@ -1,6 +1,7 @@
 import { AfterViewInit, Component, ElementRef, Injector, ViewChild, Renderer2 } from '@angular/core'
 
 import { createEditor } from './rete'
+import { createAndroidCode } from './rete/default'
 
 @Component({
   selector: 'app-root',
@@ -15,5 +16,9 @@ export class AppComponent implements AfterViewInit {
 
   async ngAfterViewInit() {
     await createEditor(this.container.nativeElement, this.injector);
+  }
+
+  onCreateCode(){
+    createAndroidCode();
   }
 }

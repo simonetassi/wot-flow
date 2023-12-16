@@ -6,7 +6,8 @@ import { addThingNode } from '../rete/default';
 import { addActionNode } from '../rete/default';
 import { addPropertyNode } from '../rete/default';
 
-interface YourDataType {
+interface Thing {
+  id: string;
   title: string;
   actions: { [key: string]: string };
   properties: { [key: string]: string };
@@ -19,7 +20,7 @@ interface YourDataType {
 })
 
 export class ThingExpandableComponent implements OnInit {
-  data: YourDataType[] = []; // Replace YourDataType with the actual type of your data
+  data: Thing[] = [];
 
   constructor(private sanitizer: DomSanitizer, private dataService: DataService) { }
 
@@ -42,12 +43,12 @@ export class ThingExpandableComponent implements OnInit {
   }
 
   onAddActionNode(actionName: string) {
-    // Call the addThingNode function from createEditor
+    // Call the addActionNode function from createEditor
     addActionNode(actionName);
   }
 
   onAddPropertyNode(propertyName: string) {
-    // Call the addThingNode function from createEditor
+    // Call the addPropertyNode function from createEditor
     addPropertyNode(propertyName);
   }
 }

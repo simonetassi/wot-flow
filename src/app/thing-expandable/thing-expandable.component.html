@@ -1,4 +1,4 @@
-<mat-expansion-panel *ngFor="let element of data" class="panel">
+<mat-expansion-panel *ngFor="let element of data" class="panel" [attr.id]="element.id">
     <mat-expansion-panel-header>
         {{ element.title }}
     </mat-expansion-panel-header>
@@ -7,7 +7,6 @@
         <button mat-button *ngFor="let action of getObjectKeys(element.actions)" class="action-btn"
             (click)="onAddActionNode(action)">{{ action }}</button>
         <button mat-button *ngFor="let property of getObjectKeys(element.properties)" class="property-btn"
-            (click)="onAddPropertyNode(property)">{{ property
-            }}</button>
+            (click)="onAddPropertyNode(property)">{{ property }}</button>
     </ng-template>
 </mat-expansion-panel>
