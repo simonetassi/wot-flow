@@ -172,4 +172,6 @@ export async function addPropertyNode(propertyName: string) {
   await editor.addNode(new PropertyNode(propertyName));
 }
 
-function createAndroidCode(nodes: any) { }
+function createAndroidCode(nodes: any) {
+  console.log("createAndroidCode!");
+ }
