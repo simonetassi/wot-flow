@@ -41,8 +41,10 @@ class Connection<A extends Node, B extends Node> extends Classic.Connection<
 class ThingNode extends Classic.Node {
   width = 180;
   height = 120;
-  constructor(initial: string, id?: string) {
+  thingId: string;
+  constructor(initial: string, thingId: string) {
     super(initial);
+    this.thingId = thingId;
     this.addInput('in', new Classic.Input(socket));
     this.addOutput('value', new Classic.Output(socket));
     return this;
@@ -52,8 +54,10 @@ class ThingNode extends Classic.Node {
 class PropertyNode extends Classic.Node {
   width = 180;
   height = 120;
-  constructor(initial: string) {
+  thingId: string;
+  constructor(initial: string, thingId: string) {
     super(initial);
+    this.thingId = thingId;
     this.addInput('in', new Classic.Input(socket));
     this.addOutput('value', new Classic.Output(socket));
     return this;
@@ -63,8 +67,10 @@ class PropertyNode extends Classic.Node {
 class ActionNode extends Classic.Node {
   width = 180;
   height = 120;
-  constructor(initial: string) {
+  thingId: string;
+  constructor(initial: string, thingId: string) {
     super(initial);
+    this.thingId = thingId;
     this.addInput('in', new Classic.Input(socket));
     this.addOutput('value', new Classic.Output(socket));
     return this;
@@ -128,18 +134,22 @@ export async function createEditor(container: HTMLElement, injector: Injector) {
   };
 }
 
-export async function addThingNode(thingName: string) {
-  await editor.addNode(new ThingNode(thingName));
+export async function addThingNode(thingName: string, thingId: string) {
+  await editor.addNode(new ThingNode(thingName, thingId));
 }
 
-export async function addActionNode(actionName: string) {
-  await editor.addNode(new ActionNode(actionName));
+export async function addActionNode(actionName: string, thingId: string) {
+  await editor.addNode(new ActionNode(actionName, thingId));
 }
 
-export async function addPropertyNode(propertyName: string) {
-  await editor.addNode(new PropertyNode(propertyName));
+export async function addPropertyNode(propertyName: string, thingId: string) {
+  await editor.addNode(new PropertyNode(propertyName, thingId));
 }
 
 export function createAndroidCode() {
   console.log("createAndroidCode!");
- }
+  const nodes = editor.getNodes();
+  const connections = editor.getConnections();
+
+  console.log(nodes, connections);
+}

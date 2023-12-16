@@ -28,6 +28,7 @@ export class ThingExpandableComponent implements OnInit {
     // http get from zion
     this.dataService.getThings().subscribe(
       (data) => {
+        console.log(data);
         this.data = data;
       }
     );
@@ -37,18 +38,18 @@ export class ThingExpandableComponent implements OnInit {
     return Object.keys(obj);
   }
 
-  onAddThingNode(thingName: string) {
+  onAddThingNode(thingName: string, thingId: string) {
     // Call the addThingNode function from createEditor
-    addThingNode(thingName);
+    addThingNode(thingName, thingId);
   }
 
-  onAddActionNode(actionName: string) {
+  onAddActionNode(actionName: string, thingId: string) {
     // Call the addActionNode function from createEditor
-    addActionNode(actionName);
+    addActionNode(actionName, thingId);
   }
 
-  onAddPropertyNode(propertyName: string) {
+  onAddPropertyNode(propertyName: string, thingId: string) {
     // Call the addPropertyNode function from createEditor
-    addPropertyNode(propertyName);
+    addPropertyNode(propertyName, thingId);
   }
 }
