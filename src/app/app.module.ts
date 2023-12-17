@@ -25,6 +25,7 @@ import { HttpClientModule } from '@angular/common/http';
 import { ActionNodeComponent } from './customization/nodes/action-node/action-node.component';
 import { PropertyNodeComponent } from './customization/nodes/property-node/property-node.component';
 import { ThingNodeComponent } from './customization/nodes/thing-node/thing-node.component';
+import { BasicFunctionNodeComponent } from './customization/nodes/basic-function-node/basic-function-node.component';
 import { ThingExpandableComponent } from './thing-expandable/thing-expandable.component';
 
 
@@ -37,6 +38,7 @@ import { ThingExpandableComponent } from './thing-expandable/thing-expandable.co
     ActionNodeComponent,
     PropertyNodeComponent,
     ThingNodeComponent,
+    BasicFunctionNodeComponent,
     ThingExpandableComponent,
   ],
   imports: [BrowserModule, ReteModule, BrowserAnimationsModule, MatButtonModule, MatIconModule, MatSidenavModule,

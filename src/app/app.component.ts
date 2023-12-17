@@ -2,6 +2,7 @@ import { AfterViewInit, Component, ElementRef, Injector, ViewChild, Renderer2 } 
 
 import { createEditor } from './rete'
 import { createAndroidCode } from './rete/default'
+import { addBasicFunctionNode } from './rete/default'
 
 @Component({
   selector: 'app-root',
@@ -18,7 +19,11 @@ export class AppComponent implements AfterViewInit {
     await createEditor(this.container.nativeElement, this.injector);
   }
 
-  onCreateCode(){
+  onCreateCode() {
     createAndroidCode();
+  }
+
+  onAddBasicFunctionNode(name: string) {
+    addBasicFunctionNode(name);
   }
 }

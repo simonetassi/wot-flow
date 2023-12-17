@@ -26,8 +26,9 @@ import { ActionNodeComponent } from '../customization/nodes/action-node/action-n
 import { PropertyNodeComponent } from '../customization/nodes/property-node/property-node.component';
 import { ThingNodeComponent } from '../customization/nodes/thing-node/thing-node.component';
 import { Component, ElementRef, Renderer2, ViewChild } from '@angular/core';
+import { BasicFunctionNodeComponent } from '../customization/nodes/basic-function-node/basic-function-node.component';
 
-type Node = ThingNode | ActionNode | PropertyNode;
+type Node = ThingNode | ActionNode | PropertyNode | BasicFunctionNode;
 type Conn =
   | Connection<ThingNode, PropertyNode>
   | Connection<ThingNode, ActionNode>;
@@ -39,6 +40,19 @@ class Connection<A extends Node, B extends Node> extends Classic.Connection<
 > { }
 
 class ThingNode extends Classic.Node {
+  width = 180;
+  height = 120;
+  thingId: string;
+  constructor(initial: string, thingId: string) {
+    super(initial);
+    this.thingId = thingId;
+    this.addInput('in', new Classic.Input(socket));
+    this.addOutput('value', new Classic.Output(socket));
+    return this;
+  }
+}
+
+class ActionNode extends Classic.Node {
   width = 180;
   height = 120;
   thingId: string;
@@ -64,18 +78,19 @@ class PropertyNode extends Classic.Node {
   }
 }
 
-class ActionNode extends Classic.Node {
+
+class BasicFunctionNode extends Classic.Node {
   width = 180;
   height = 120;
-  thingId: string;
-  constructor(initial: string, thingId: string) {
+
+  constructor(initial: string) {
     super(initial);
-    this.thingId = thingId;
     this.addInput('in', new Classic.Input(socket));
     this.addOutput('value', new Classic.Output(socket));
     return this;
   }
 }
+
 
 type AreaExtra = Area2D<Schemes> | AngularArea2D<Schemes> | ContextMenuExtra;
 
@@ -102,6 +117,8 @@ export async function createEditor(container: HTMLElement, injector: Injector) {
             return ActionNodeComponent;
           } else if (context.payload instanceof PropertyNode) {
             return PropertyNodeComponent;
+          } else if (context.payload instanceof BasicFunctionNode) {
+            return BasicFunctionNodeComponent;
           }
           return ThingNodeComponent;
         }
@@ -146,10 +163,33 @@ export async function addPropertyNode(propertyName: string, thingId: string) {
   await editor.addNode(new PropertyNode(propertyName, thingId));
 }
 
+export async function addBasicFunctionNode(name: string) {
+  await editor.addNode(new BasicFunctionNode(name));
+}
+
+function getConnectedNode(id: string) {
+
+}
+
+
 export function createAndroidCode() {
   console.log("createAndroidCode!");
   const nodes = editor.getNodes();
   const connections = editor.getConnections();
 
   console.log(nodes, connections);
+
+  // const node = getFirstConnectedNode;
+
+  // if (node instanceof ThingNode) {
+  //   console.log("thing node!");
+  // } else if (node instanceof ActionNode) {
+  //   console.log("action node!");
+  // } else if (node instanceof PropertyNode) {
+  //   console.log("property node!")
+  // } else if (node instanceof BasicFunctionNode) {
+  //   console.log("basic function node!")
+  // } else {
+  //   console.log("node not recognized!")
+  // }
 }

@@ -28,7 +28,6 @@ export class ThingExpandableComponent implements OnInit {
     // http get from zion
     this.dataService.getThings().subscribe(
       (data) => {
-        console.log(data);
         this.data = data;
       }
     );
