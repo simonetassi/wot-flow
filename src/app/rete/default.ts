@@ -19,19 +19,26 @@ import {
   Presets as ContextMenuPresets,
 } from 'rete-context-menu-plugin';
 
+import {
+  AutoArrangePlugin,
+  Presets as ArrangePresets
+} from "rete-auto-arrange-plugin";
+
 import { DataService } from '../data.service';
 import { restrictor } from 'rete-area-plugin/_types/extensions';
 import { CustomNodeComponent } from '../customization/custom-node/custom-node.component';
 import { ActionNodeComponent } from '../customization/nodes/action-node/action-node.component';
 import { PropertyNodeComponent } from '../customization/nodes/property-node/property-node.component';
 import { ThingNodeComponent } from '../customization/nodes/thing-node/thing-node.component';
-import { Component, ElementRef, Renderer2, ViewChild } from '@angular/core';
 import { BasicFunctionNodeComponent } from '../customization/nodes/basic-function-node/basic-function-node.component';
+import { connection } from 'rete-area-3d-plugin/_types/extensions/forms';
 
 type Node = ThingNode | ActionNode | PropertyNode | BasicFunctionNode;
 type Conn =
   | Connection<ThingNode, PropertyNode>
-  | Connection<ThingNode, ActionNode>;
+  | Connection<ThingNode, ActionNode>
+  | Connection<PropertyNode, BasicFunctionNode>
+  | Connection<ActionNode, BasicFunctionNode>;
 type Schemes = GetSchemes<Node, Conn>;
 
 class Connection<A extends Node, B extends Node> extends Classic.Connection<
@@ -82,7 +89,7 @@ class PropertyNode extends Classic.Node {
 class BasicFunctionNode extends Classic.Node {
   width = 180;
   height = 120;
-
+  thingId = 0;
   constructor(initial: string) {
     super(initial);
     this.addInput('in', new Classic.Input(socket));
@@ -96,7 +103,8 @@ type AreaExtra = Area2D<Schemes> | AngularArea2D<Schemes> | ContextMenuExtra;
 
 const socket = new Classic.Socket('socket');
 const editor = new NodeEditor<Schemes>();
-
+const arrange = new AutoArrangePlugin<Schemes>();
+arrange.addPreset(ArrangePresets.classic.setup());
 
 export async function createEditor(container: HTMLElement, injector: Injector) {
   const area = new AreaPlugin<Schemes, AreaExtra>(container);
@@ -167,8 +175,46 @@ export async function addBasicFunctionNode(name: string) {
   await editor.addNode(new BasicFunctionNode(name));
 }
 
-function getConnectedNode(id: string) {
+function getConnectedNode(currentId: string, nodes: Node[], connections: Conn[]) {
+  const c = connections.find(conn => conn.source === currentId) || undefined;
+  if (c) {
+    return getNodeById(nodes, c.target);
+  } else {
+    return null;
+  }
+}
 
+function getFirstThingNode(nodes: Node[]) {
+  return nodes.find(node => node instanceof ThingNode) || null;
+}
+
+function getNodeById(nodes: Node[], id: string) {
+  return nodes.find(node => node.id === id) || null;
+}
+
+function inspectNextNode(currentId: string, nodes: Node[], connections: Conn[], code: string): string {
+  const c = connections.find(conn => conn.source === currentId) || undefined;
+  if (c) {
+    const connectedNode = getNodeById(nodes, c.target);
+    if (connectedNode == null) {
+      console.log("ERROR! No more connections");
+    } else if (connectedNode instanceof ActionNode) {
+      code += `
+      ConsumedThingAction action = consumedThing.getAction("${connectedNode.label}");`;
+    } else if (connectedNode instanceof PropertyNode) {
+      code += `
+      ConsumedThingProperty property = consumedThing.getProperty("${connectedNode.label}");`;
+    } else if (connectedNode.label == 'invokeAction') {
+      code += `
+      action.invoke();`
+    } else if (connectedNode.label == 'observeProperty') {
+      code += `
+      property.read();`
+    }
+    return code + inspectNextNode(connectedNode!.id, nodes, connections, code);
+  } else {
+    return code;
+  }
 }
 
 
@@ -179,17 +225,28 @@ export function createAndroidCode() {
 
   console.log(nodes, connections);
 
-  // const node = getFirstConnectedNode;
+  // TODO quando verranno aggiunte operazioni algebriche
+  // prima di tutto controllare se ci sono operazioni algebriche
+  // se si passare l'handling operaz algebrica a funz dedicata
+  // altrimenti creare qui codice semplice (thing-property/thing-action)  
 
-  // if (node instanceof ThingNode) {
-  //   console.log("thing node!");
-  // } else if (node instanceof ActionNode) {
-  //   console.log("action node!");
-  // } else if (node instanceof PropertyNode) {
-  //   console.log("property node!")
-  // } else if (node instanceof BasicFunctionNode) {
-  //   console.log("basic function node!")
-  // } else {
-  //   console.log("node not recognized!")
-  // }
+  let code = ``;
+
+  // start from thing node
+  const node = getFirstThingNode(nodes);
+  code += ``
+
+  // check if there is a thing node in the editor
+  if (node != null) {
+    const thingId = node.thingId;
+    code += `ConsumedThing consumedThing = consumedThings.get("${thingId}");`
+
+    const connectedNode = getConnectedNode(node.id, nodes, connections);
+
+
+  } else {
+    console.log("ERROR! No Thing Nodes in the editor")
+  }
+
+  console.log(code);
 }
