@@ -1,0 +1,11 @@
+<div mat-dialog-content>
+  <p>Insert routine name</p>
+  <mat-form-field>
+    <mat-label>Routine Name</mat-label>
+    <input matInput cdkFocusInitial [(ngModel)]="data.name">
+  </mat-form-field>
+</div>
+<div mat-dialog-actions>
+  <button mat-button color="primary" [mat-dialog-close]="data.name">Save</button>
+  <button mat-button (click)="onNoClick()">Cancel</button>
+</div>

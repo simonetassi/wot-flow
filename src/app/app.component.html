@@ -148,7 +148,6 @@
   }
 </style>
 
-
 <mat-drawer-container autosize class="child">
   <mat-drawer #drawer opened="true" mode="side" position="start">
     <mat-nav-list>
@@ -170,9 +169,10 @@
     <button (click)="drawer.toggle();" mat-icon-button class="child" id="expand-btn">
       <mat-icon>keyboard_arrow_right</mat-icon>
     </button>
-    <button mat-fab color="primary" class="mat-elevation-z0 fab" id="saveBtn" (click)="onCreateCode()">
+    <dialog-handler-button class="fab"></dialog-handler-button>
+    <!-- <button mat-fab mat-raised-button color="primary" class="mat-elevation-z0 fab" id="saveBtn" (click)="onCreateCode()">
       <mat-icon>done</mat-icon>
-    </button>
+    </button> -->
     <div class="rete" role="main" #rete></div>
   </mat-drawer-content>
 </mat-drawer-container>

@@ -1,7 +1,6 @@
 import { AfterViewInit, Component, ElementRef, Injector, ViewChild, Renderer2 } from '@angular/core'
 
 import { createEditor } from './rete'
-import { createAndroidCode } from './rete/default'
 import { addBasicFunctionNode } from './rete/default'
 
 @Component({
@@ -17,10 +16,6 @@ export class AppComponent implements AfterViewInit {
 
   async ngAfterViewInit() {
     await createEditor(this.container.nativeElement, this.injector);
-  }
-
-  onCreateCode() {
-    createAndroidCode();
   }
 
   onAddBasicFunctionNode(name: string) {

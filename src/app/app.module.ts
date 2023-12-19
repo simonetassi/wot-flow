@@ -16,6 +16,10 @@ import { MatMenuModule } from '@angular/material/menu';
 import { MatListModule } from '@angular/material/list';
 import { MatExpansionModule } from '@angular/material/expansion';
 
+import { MatDialogModule } from '@angular/material/dialog';
+import { FormsModule } from '@angular/forms';
+import { MatInputModule } from '@angular/material/input';
+import { MatFormFieldModule } from '@angular/material/form-field';
 
 import { ReteModule } from 'rete-angular-plugin/14';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
@@ -27,6 +31,7 @@ import { PropertyNodeComponent } from './customization/nodes/property-node/prope
 import { ThingNodeComponent } from './customization/nodes/thing-node/thing-node.component';
 import { BasicFunctionNodeComponent } from './customization/nodes/basic-function-node/basic-function-node.component';
 import { ThingExpandableComponent } from './thing-expandable/thing-expandable.component';
+import { DialogHandlerButton, RoutineNameDialogComponent } from './routine-name-dialog/routine-name-dialog.component';
 
 
 @NgModule({
@@ -40,9 +45,12 @@ import { ThingExpandableComponent } from './thing-expandable/thing-expandable.co
     ThingNodeComponent,
     BasicFunctionNodeComponent,
     ThingExpandableComponent,
+    RoutineNameDialogComponent,
+    DialogHandlerButton
   ],
   imports: [BrowserModule, ReteModule, BrowserAnimationsModule, MatButtonModule, MatIconModule, MatSidenavModule,
-    MatToolbarModule, MatMenuModule, MatListModule, MatExpansionModule, HttpClientModule],
+    MatToolbarModule, MatMenuModule, MatListModule, MatExpansionModule, HttpClientModule, MatFormFieldModule,
+    MatInputModule, FormsModule, MatDialogModule],
   providers: [],
   bootstrap: [AppComponent],
 })

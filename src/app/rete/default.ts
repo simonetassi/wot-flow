@@ -211,14 +211,13 @@ function inspectNextNode(currentId: string, nodes: Node[], connections: Conn[], 
       code += `
       property.read();`
     }
-    return code + inspectNextNode(connectedNode!.id, nodes, connections, code);
+    return inspectNextNode(connectedNode!.id, nodes, connections, code);
   } else {
     return code;
   }
 }
 
-
-export function createAndroidCode() {
+export function createAndroidCode(routineName: string) {
   console.log("createAndroidCode!");
   const nodes = editor.getNodes();
   const connections = editor.getConnections();
@@ -241,12 +240,10 @@ export function createAndroidCode() {
     const thingId = node.thingId;
     code += `ConsumedThing consumedThing = consumedThings.get("${thingId}");`
 
-    const connectedNode = getConnectedNode(node.id, nodes, connections);
-
-
+    // const connectedNode = getConnectedNode(node.id, nodes, connections);
+    code = inspectNextNode(node.id, nodes, connections, code);
   } else {
     console.log("ERROR! No Thing Nodes in the editor")
   }
-
-  console.log(code);
+  console.log(routineName, code);
 }
