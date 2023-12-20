@@ -24,12 +24,12 @@ export class RoutineController {
 
     @Delete(':id')
     deleteOne(@Param('id') id: string): Observable<any>{
-        return this.routineService.deleteOne(Number(id));
+        return this.routineService.deleteOne(id);
     }
 
     @Put(':id')
     updateOne(@Param('id') id: string, @Body() routine: Routine): Observable<any>{
-        return this.routineService.updateOne(Number(id), routine)
+        return this.routineService.updateOne(id, routine)
     }
 
 }

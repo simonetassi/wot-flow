@@ -1,4 +1,5 @@
 export interface Routine {
-    id: number;
+    id: string;
+    name: string;
     javaCode: string;
 }
