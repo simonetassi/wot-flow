@@ -2,23 +2,26 @@ import { Body, Controller, Delete, Get, Param, Post, Put } from '@nestjs/common'
 import { RoutineService } from '../service/routine.service';
 import { Routine } from '../models/routine.interface';
 import { Observable } from 'rxjs';
+import { randomUUID } from 'crypto';
+import { RoutineDto } from '../dtos/routine.dto';
 
 @Controller('routines')
 export class RoutineController {
     constructor(private routineService: RoutineService){}
 
     @Post()
-    create(@Body() routine: Routine): Observable<Routine>{
-        return this.routineService.create(routine);
+    create(@Body() routineDto: RoutineDto): Observable<RoutineDto>{
+        routineDto.id = randomUUID();
+        return this.routineService.create(routineDto);
     }
 
     @Get(':id')
-    findOneBy(@Param() params): Observable<Routine>{
+    findOneBy(@Param() params): Observable<RoutineDto>{
         return this.routineService.findOneBy(params.id);
     }
 
     @Get()
-    findAll(): Observable<Routine[]>{
+    findAll(): Observable<RoutineDto[]>{
         return this.routineService.findAll();
     }
 
@@ -28,8 +31,8 @@ export class RoutineController {
     }
 
     @Put(':id')
-    updateOne(@Param('id') id: string, @Body() routine: Routine): Observable<any>{
-        return this.routineService.updateOne(id, routine)
+    updateOne(@Param('id') id: string, @Body() routineDto: RoutineDto): Observable<any>{
+        return this.routineService.updateOne(id, routineDto)
     }
 
 }

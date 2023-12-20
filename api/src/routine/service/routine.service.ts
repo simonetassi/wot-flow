@@ -5,6 +5,7 @@ import { Repository } from 'typeorm';
 import { Routine } from '../models/routine.interface';
 import { Observable, from } from 'rxjs';
 import { randomUUID } from 'crypto';
+import { RoutineDto } from '../dtos/routine.dto';
 
 @Injectable()
 export class RoutineService {
@@ -12,16 +13,15 @@ export class RoutineService {
         @InjectRepository(RoutineEntity) private readonly routineRepository: Repository<RoutineEntity>
     ) { }
 
-    create(routine: Routine): Observable<Routine> {
-        routine.id = randomUUID();
-        return from(this.routineRepository.save(routine));
+    create(routineDto: RoutineDto): Observable<Routine> {
+        return from(this.routineRepository.save(routineDto));
     }
 
-    findOneBy(id: string): Observable<Routine> {
+    findOneBy(id: string): Observable<RoutineDto> {
         return from(this.routineRepository.findOneBy({ id }));
     }
 
-    findAll(): Observable<Routine[]> {
+    findAll(): Observable<RoutineDto[]> {
         return from(this.routineRepository.find());
     }
 
@@ -29,7 +29,7 @@ export class RoutineService {
         return from(this.routineRepository.delete(id));
     }
 
-    updateOne(id: string, routine: Routine): Observable<any> {
-        return from(this.routineRepository.update(id, routine));
+    updateOne(id: string, routineDto: RoutineDto): Observable<any> {
+        return from(this.routineRepository.update(id, routineDto));
     }
 }

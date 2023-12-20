@@ -5,6 +5,7 @@ import {
   MatDialogRef
 } from '@angular/material/dialog';
 import { createAndroidCode } from '../rete/default';
+import { DataService } from '../data.service';
 
 
 export interface DialogData {
@@ -19,7 +20,7 @@ export interface DialogData {
 export class DialogHandlerButton {
   name: string;
 
-  constructor(public dialog: MatDialog) {
+  constructor(public dialog: MatDialog, private dataService: DataService) {
     this.name = '';
   }
 
@@ -29,9 +30,7 @@ export class DialogHandlerButton {
     });
 
     dialogRef.afterClosed().subscribe(result => {
-      console.log(`Dialog closed. Name: ${result}`);
-      createAndroidCode(result);
-      location.reload();
+      createAndroidCode(result, this.dataService);
     });
   }
 }

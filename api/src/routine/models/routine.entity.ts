@@ -5,9 +5,9 @@ export class RoutineEntity {
     @PrimaryGeneratedColumn('uuid')
     id: string;
 
-    @Column()
+    @Column('text')
     name: string;
 
-    @Column()
+    @Column('text')
     javaCode: string;
 }

@@ -24,7 +24,7 @@ import {
   Presets as ArrangePresets
 } from "rete-auto-arrange-plugin";
 
-import { DataService } from '../data.service';
+import { DataService, Routine } from '../data.service';
 import { restrictor } from 'rete-area-plugin/_types/extensions';
 import { CustomNodeComponent } from '../customization/custom-node/custom-node.component';
 import { ActionNodeComponent } from '../customization/nodes/action-node/action-node.component';
@@ -199,17 +199,13 @@ function inspectNextNode(currentId: string, nodes: Node[], connections: Conn[], 
     if (connectedNode == null) {
       console.log("ERROR! No more connections");
     } else if (connectedNode instanceof ActionNode) {
-      code += `
-      ConsumedThingAction action = consumedThing.getAction("${connectedNode.label}");`;
+      code += `ConsumedThingAction action = consumedThing.getAction("${connectedNode.label}");`;
     } else if (connectedNode instanceof PropertyNode) {
-      code += `
-      ConsumedThingProperty property = consumedThing.getProperty("${connectedNode.label}");`;
+      code += `ConsumedThingProperty property = consumedThing.getProperty("${connectedNode.label}");`;
     } else if (connectedNode.label == 'invokeAction') {
-      code += `
-      action.invoke();`
+      code += `action.invoke();`
     } else if (connectedNode.label == 'observeProperty') {
-      code += `
-      property.read();`
+      code += `property.read();`
     }
     return inspectNextNode(connectedNode!.id, nodes, connections, code);
   } else {
@@ -217,12 +213,9 @@ function inspectNextNode(currentId: string, nodes: Node[], connections: Conn[], 
   }
 }
 
-export function createAndroidCode(routineName: string) {
-  console.log("createAndroidCode!");
+export function createAndroidCode(routineName: string, dataService: DataService) {
   const nodes = editor.getNodes();
   const connections = editor.getConnections();
-
-  console.log(nodes, connections);
 
   // TODO quando verranno aggiunte operazioni algebriche
   // prima di tutto controllare se ci sono operazioni algebriche
@@ -245,5 +238,9 @@ export function createAndroidCode(routineName: string) {
   } else {
     console.log("ERROR! No Thing Nodes in the editor")
   }
-  console.log(routineName, code);
+
+  const routine = new Routine("", routineName, code)
+  dataService.postRoutine(routine).subscribe(response => {
+    location.reload();
+  });
 }
