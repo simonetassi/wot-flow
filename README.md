@@ -20,6 +20,6 @@ npm run start
 
 To run the backend on `localhost:3001` run:
 ```
-cd frontend
+cd api
 npm run start:dev
 ```
