@@ -1,0 +1,40 @@
+version: '3.8'
+services:
+  api:
+    build:
+      dockerfile: Dockerfile
+      context: ./api
+      # only build dev stage
+      target: development
+      # target: production
+
+      # Mount host dir to docker container
+      # Mount api dir (./api) to docker container
+      # Reflect changes from host to container
+    volumes:
+      - ./api:/wot-flow/src/app
+      - /wot-flow/src/app/node_modules
+    # To run in DEBUG mode:  npm run start:debug
+    command: npm run start:dev
+    environment:
+      DATABASE_URL: 
+      NODE_ENV: development
+      PORT: 3001
+    ports:
+      - 3001:3001
+      - 9229:9229
+
+  frontend:
+    build:
+      dockerfile: Dockerfile
+      context: ./frontend
+      target: development
+    command: npm run start
+    volumes:
+      - ./frontend:/wot-flow/frontend/src/app
+      - /wot-flow/frontend/src/app/node_modules
+    ports:
+      - "4200:4200"
+    links: 
+      - api
+
