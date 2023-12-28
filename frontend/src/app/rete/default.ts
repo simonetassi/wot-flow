@@ -98,7 +98,6 @@ class BasicFunctionNode extends Classic.Node {
   }
 }
 
-
 type AreaExtra = Area2D<Schemes> | AngularArea2D<Schemes> | ContextMenuExtra;
 
 const socket = new Classic.Socket('socket');
@@ -149,6 +148,7 @@ export async function createEditor(container: HTMLElement, injector: Injector) {
   angularRender.addPreset(AngularPresets.classic.setup());
   angularRender.addPreset(AngularPresets.contextMenu.setup());
 
+  // area constraints
   AreaExtensions.restrictor(area, {
     scaling: () => ({ min: 0.4, max: 1 }),
     translation: () => ({ left: 0, top: 0, right: 300, bottom: 300 })
@@ -159,6 +159,8 @@ export async function createEditor(container: HTMLElement, injector: Injector) {
   };
 }
 
+
+// add node function (for sidebar buttons)
 export async function addThingNode(thingName: string, thingId: string) {
   await editor.addNode(new ThingNode(thingName, thingId));
 }
@@ -192,6 +194,12 @@ function getNodeById(nodes: Node[], id: string) {
   return nodes.find(node => node.id === id) || null;
 }
 
+// check that editor is not empty before code generation
+export function editorIsEmpty(){
+  return (getFirstThingNode(editor.getNodes()) == null);
+}
+
+// recursive function to inspect next node in the flow
 function inspectNextNode(currentId: string, nodes: Node[], connections: Conn[], code: string): string {
   const c = connections.find(conn => conn.source === currentId) || undefined;
   if (c) {

@@ -5,6 +5,7 @@ import {
   MatDialogRef
 } from '@angular/material/dialog';
 import { createAndroidCode } from '../rete/default';
+import { editorIsEmpty } from '../rete/default';
 import { DataService } from '../data.service';
 
 
@@ -24,7 +25,11 @@ export class DialogHandlerButton {
     this.name = '';
   }
 
-  openDialog(): void {
+  checkEditor(): boolean {
+    return editorIsEmpty();
+  }
+
+  openNameDialog(): void {
     const dialogRef = this.dialog.open(RoutineNameDialogComponent, {
       data: { name: this.name },
     });
