@@ -239,10 +239,25 @@ export function createAndroidCode(routineName: string, dataService: DataService)
   // check if there is a thing node in the editor
   if (node != null) {
     const thingId = node.thingId;
-    code += `ConsumedThing consumedThing = consumedThings.get("${thingId}");`
+    // TODO change this in getConsumedThingById -> consume()
+
+    const toInject = inspectNextNode(node.id, nodes, connections, ``);
+
+
+    code += `viewModel.getThingByIdLiveData("${thingId}").observe((LifecycleOwner) context, entity -> {
+                if (entity != null) {
+                    try {
+                        ConsumedThing consumedThing = WotInteraction.getInstance(context).getWot().consume(Thing.fromJson(entity.thingJSON));
+                        ${toInject}
+                    } catch(WotException | JSONException ex){
+                        ex.printStackTrace();
+                    }
+                } else {
+                    System.out.println("RUNTIME ERROR: Thing not found.");
+                }
+            });`
 
     // const connectedNode = getConnectedNode(node.id, nodes, connections);
-    code = inspectNextNode(node.id, nodes, connections, code);
   } else {
     console.log("ERROR! No Thing Nodes in the editor")
   }
