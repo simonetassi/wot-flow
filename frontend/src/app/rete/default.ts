@@ -234,12 +234,10 @@ export function createAndroidCode(routineName: string, dataService: DataService)
 
   // start from thing node
   const node = getFirstThingNode(nodes);
-  code += ``
 
   // check if there is a thing node in the editor
   if (node != null) {
     const thingId = node.thingId;
-    // TODO change this in getConsumedThingById -> consume()
 
     const toInject = inspectNextNode(node.id, nodes, connections, ``);
 
@@ -257,7 +255,6 @@ export function createAndroidCode(routineName: string, dataService: DataService)
                 }
             });`
 
-    // const connectedNode = getConnectedNode(node.id, nodes, connections);
   } else {
     console.log("ERROR! No Thing Nodes in the editor")
   }
