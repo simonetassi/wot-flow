@@ -1,4 +1,4 @@
-import { IsString, IsUUID } from "class-validator";
+import { IsArray, IsString, IsUUID } from "class-validator";
 
 export class RoutineDto{
     @IsUUID()
@@ -10,4 +10,7 @@ export class RoutineDto{
 
     @IsString()
     javaCode: string;
+
+    @IsString()
+    thingIds: string;
 }

@@ -89,7 +89,7 @@ class PropertyNode extends Classic.Node {
 class BasicFunctionNode extends Classic.Node {
   width = 180;
   height = 120;
-  thingId = 0;
+  thingId = '';
   constructor(initial: string) {
     super(initial);
     this.addInput('in', new Classic.Input(socket));
@@ -231,16 +231,17 @@ export function createAndroidCode(routineName: string, dataService: DataService)
   // altrimenti creare qui codice semplice (thing-property/thing-action)  
 
   let code = ``;
+  let thingIds: string[] = [];
 
   // start from thing node
   const node = getFirstThingNode(nodes);
 
   // check if there is a thing node in the editor
   if (node != null) {
-    const thingId = node.thingId;
+    const thingId : string = node.thingId;
+    thingIds.push(thingId);
 
     const toInject = inspectNextNode(node.id, nodes, connections, ``);
-
 
     code += `
               import com.example.wot_servient.wot.thing.ConsumedThing;
@@ -258,7 +259,7 @@ export function createAndroidCode(routineName: string, dataService: DataService)
     console.log("ERROR! No Thing Nodes in the editor")
   }
 
-  const routine = new Routine("", routineName, code)
+  const routine = new Routine("", routineName, code, JSON.stringify(thingIds));
   dataService.postRoutine(routine).subscribe(response => {
     location.reload();
   });

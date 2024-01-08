@@ -10,4 +10,7 @@ export class RoutineEntity {
 
     @Column('text')
     javaCode: string;
+
+    @Column('text')
+    thingIds: string;
 }

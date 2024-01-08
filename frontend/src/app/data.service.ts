@@ -8,11 +8,13 @@ export class Routine {
   id: string;
   name: string;
   javaCode: string;
+  thingIds: string;
 
-  constructor(id: string, name: string, javaCode: string) {
+  constructor(id: string, name: string, javaCode: string, thingIds: string) {
     this.id = id;
     this.name = name;
     this.javaCode = javaCode;
+    this.thingIds = thingIds;
   }
 }
 
