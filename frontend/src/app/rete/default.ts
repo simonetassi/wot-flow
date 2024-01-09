@@ -53,7 +53,6 @@ class ThingNode extends Classic.Node {
   constructor(initial: string, thingId: string) {
     super(initial);
     this.thingId = thingId;
-    this.addInput('in', new Classic.Input(socket));
     this.addOutput('value', new Classic.Output(socket));
     return this;
   }
@@ -84,7 +83,6 @@ class PropertyNode extends Classic.Node {
     return this;
   }
 }
-
 
 class BasicFunctionNode extends Classic.Node {
   width = 180;
