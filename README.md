@@ -2,7 +2,8 @@
 This tool is designed to create Java code for the `android-wot-servient` from a flow-based editor.
 
 ## Development
-This project is built with AngularJS and NestJS.
+This project is built with AngularJS and NestJS.\
+It relies on `zion`, a WoT TDD implementation (https://github.com/vaimee/zion).
 
 ## Usage
 First thing first insert your database string in the /api/.env file
