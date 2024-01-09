@@ -53,6 +53,12 @@
     color: white;
   }
 
+  .arithmetic-function-btn {
+    background-color: rgba(165, 55, 253, 1);
+    margin: 0.3rem;
+    color: white;
+  }
+
   .rete {
     position: relative;
     width: 100%;
@@ -161,6 +167,8 @@
             (click)="onAddBasicFunctionNode('observeProperty')">observeProperty</button>
           <button mat-button class="basic-function-btn"
             (click)="onAddBasicFunctionNode('invokeAction')">invokeAction</button>
+          <button mat-button class="arithmetic-function-btn" 
+          (click)="onAddArithmeticFunctionNode('average')">average</button>
         </ng-template>
       </mat-expansion-panel>
     </mat-nav-list>

@@ -30,6 +30,7 @@ import { ActionNodeComponent } from './customization/nodes/action-node/action-no
 import { PropertyNodeComponent } from './customization/nodes/property-node/property-node.component';
 import { ThingNodeComponent } from './customization/nodes/thing-node/thing-node.component';
 import { BasicFunctionNodeComponent } from './customization/nodes/basic-function-node/basic-function-node.component';
+import { ArithmeticFunctionComponent } from './customization/nodes/arithmetic-function-node /arithmetic-function-node.component';
 import { ThingExpandableComponent } from './thing-expandable/thing-expandable.component';
 import { DialogHandlerButton, RoutineNameDialogComponent } from './routine-name-dialog/routine-name-dialog.component';
 
@@ -44,6 +45,7 @@ import { DialogHandlerButton, RoutineNameDialogComponent } from './routine-name-
     PropertyNodeComponent,
     ThingNodeComponent,
     BasicFunctionNodeComponent,
+    ArithmeticFunctionComponent,
     ThingExpandableComponent,
     RoutineNameDialogComponent,
     DialogHandlerButton

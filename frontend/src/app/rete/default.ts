@@ -31,9 +31,10 @@ import { ActionNodeComponent } from '../customization/nodes/action-node/action-n
 import { PropertyNodeComponent } from '../customization/nodes/property-node/property-node.component';
 import { ThingNodeComponent } from '../customization/nodes/thing-node/thing-node.component';
 import { BasicFunctionNodeComponent } from '../customization/nodes/basic-function-node/basic-function-node.component';
+import { ArithmeticFunctionComponent } from '../customization/nodes/arithmetic-function-node /arithmetic-function-node.component';
 import { connection, node } from 'rete-area-3d-plugin/_types/extensions/forms';
 
-type Node = ThingNode | ActionNode | PropertyNode | BasicFunctionNode;
+type Node = ThingNode | ActionNode | PropertyNode | BasicFunctionNode | ArithmeticFunctionNode;
 type Conn =
   | Connection<ThingNode, PropertyNode>
   | Connection<ThingNode, ActionNode>
@@ -96,6 +97,18 @@ class BasicFunctionNode extends Classic.Node {
   }
 }
 
+class ArithmeticFunctionNode extends Classic.Node {
+  width = 180;
+  height = 120;
+  thingId = '';
+  constructor(initial: string) {
+    super(initial);
+    this.addInput('in', new Classic.Input(socket));
+    this.addOutput('value', new Classic.Output(socket));
+    return this;
+  }
+}
+
 type AreaExtra = Area2D<Schemes> | AngularArea2D<Schemes> | ContextMenuExtra;
 
 const socket = new Classic.Socket('socket');
@@ -124,6 +137,8 @@ export async function createEditor(container: HTMLElement, injector: Injector) {
             return PropertyNodeComponent;
           } else if (context.payload instanceof BasicFunctionNode) {
             return BasicFunctionNodeComponent;
+          } else if (context.payload instanceof ArithmeticFunctionNode) {
+            return ArithmeticFunctionComponent;
           }
           return ThingNodeComponent;
         }
@@ -152,10 +167,16 @@ export async function createEditor(container: HTMLElement, injector: Injector) {
       let nodes = editor.getNodes();
       let last = connections[(connections.length-1)]
       let srcNode = nodes.find(node => last.source == node.id);
+      let targetNode = nodes.find(node => last.target == node.id);
+
+      // using ${connection.length} as random value for the input/output key
+      // TODO implement smarter solution
       if(srcNode instanceof ThingNode){
-        // using connection.length as random value for the output key
-        // TODO implement smarter solution
         srcNode.addOutput(`value${connections.length}`, new Classic.Output(socket));
+        area.update('node', srcNode.id);
+      } else if (targetNode instanceof ArithmeticFunctionNode){
+        targetNode.addInput(`in${connections.length}`, new Classic.Input(socket))
+        area.update('node', targetNode.id);
       }
     }
     return context
@@ -188,6 +209,10 @@ export async function addPropertyNode(propertyName: string, thingId: string) {
 
 export async function addBasicFunctionNode(name: string) {
   await editor.addNode(new BasicFunctionNode(name));
+}
+
+export async function addArithmeticFunctionNode(name: string) {
+  await editor.addNode(new ArithmeticFunctionNode(name));
 }
 
 function getConnectedNode(currentId: string, nodes: Node[], connections: Conn[]) {

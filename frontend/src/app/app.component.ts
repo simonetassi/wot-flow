@@ -1,7 +1,7 @@
 import { AfterViewInit, Component, ElementRef, Injector, ViewChild, Renderer2 } from '@angular/core'
 
 import { createEditor } from './rete'
-import { addBasicFunctionNode } from './rete/default'
+import { addArithmeticFunctionNode, addBasicFunctionNode } from './rete/default'
 
 @Component({
   selector: 'app-root',
@@ -20,5 +20,8 @@ export class AppComponent implements AfterViewInit {
 
   onAddBasicFunctionNode(name: string) {
     addBasicFunctionNode(name);
+  }
+  onAddArithmeticFunctionNode(name: string){
+    addArithmeticFunctionNode(name);
   }
 }
