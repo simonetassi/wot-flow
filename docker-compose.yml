@@ -37,4 +37,30 @@ services:
       - "4200:4200"
     links: 
       - api
+  database:
+    image: postgres:14.3-alpine
+    environment:
+      - POSTGRES_USER=zion
+      - POSTGRES_PASSWORD=zion
+      - POSTGRES_DB=zion
+    container_name: 'zion-postgres'
+  zion:
+    image: vaimee/zion:latest
+    depends_on:
+      - database
+    entrypoint: ['sh', '-c','npm run db:migrate:latest && npm run start:prod']
+    ports: 
+      - 3000:3000
+    environment:
+      - ZION_NODE_ENV=production
+      - ZION_SERVER_PORT=3000
+      # Using task name as explained in https://github.com/vaimee/zion/issues/11#issuecomment-1434457337
+      - ZION_DB_HOST=tasks.database
+      - ZION_DB_PORT=5432
+      - ZION_DB_USER=zion
+      - ZION_DB_PASSWORD=zion
+      - ZION_DB_DATABASE=zion
+      - ZION_JWT_SECRET=change-me
+      - ZION_JWT_EXPIRES_IN=7d
+    container_name: zion
 

@@ -247,7 +247,7 @@ export function createAndroidCode(routineName: string, dataService: DataService)
               import com.example.wot_servient.wot.thing.ConsumedThing;
               import com.example.wot_servient.wot.thing.action.ConsumedThingAction;
               import com.example.wot_servient.wot.thing.property.ConsumedThingProperty;
-              ConsumedThing consumedThing = consumedThingsMap.get("urn:uuid:92e5b68f-322a-433a-8cff-f50f6ca1b519");
+              ConsumedThing consumedThing = consumedThingsMap.get("${thingId}");
               if (consumedThing != null) {
                     ${toInject}
               } else {
