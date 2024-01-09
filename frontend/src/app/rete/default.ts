@@ -31,7 +31,7 @@ import { ActionNodeComponent } from '../customization/nodes/action-node/action-n
 import { PropertyNodeComponent } from '../customization/nodes/property-node/property-node.component';
 import { ThingNodeComponent } from '../customization/nodes/thing-node/thing-node.component';
 import { BasicFunctionNodeComponent } from '../customization/nodes/basic-function-node/basic-function-node.component';
-import { connection } from 'rete-area-3d-plugin/_types/extensions/forms';
+import { connection, node } from 'rete-area-3d-plugin/_types/extensions/forms';
 
 type Node = ThingNode | ActionNode | PropertyNode | BasicFunctionNode;
 type Conn =
@@ -145,6 +145,21 @@ export async function createEditor(container: HTMLElement, injector: Injector) {
 
   angularRender.addPreset(AngularPresets.classic.setup());
   angularRender.addPreset(AngularPresets.contextMenu.setup());
+
+  editor.addPipe(context => {
+    if(context.type == 'connectioncreated'){
+      let connections = editor.getConnections();
+      let nodes = editor.getNodes();
+      let last = connections[(connections.length-1)]
+      let srcNode = nodes.find(node => last.source == node.id);
+      if(srcNode instanceof ThingNode){
+        // using connection.length as random value for the output key
+        // TODO implement smarter solution
+        srcNode.addOutput(`value${connections.length}`, new Classic.Output(socket));
+      }
+    }
+    return context
+  })
 
   // area constraints
   AreaExtensions.restrictor(area, {
