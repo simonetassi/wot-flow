@@ -25,16 +25,17 @@ import {
 } from "rete-auto-arrange-plugin";
 
 import { DataService, Routine } from '../data.service';
-import { restrictor } from 'rete-area-plugin/_types/extensions';
-import { CustomNodeComponent } from '../customization/custom-node/custom-node.component';
 import { ActionNodeComponent } from '../customization/nodes/action-node/action-node.component';
 import { PropertyNodeComponent } from '../customization/nodes/property-node/property-node.component';
 import { ThingNodeComponent } from '../customization/nodes/thing-node/thing-node.component';
 import { BasicFunctionNodeComponent } from '../customization/nodes/basic-function-node/basic-function-node.component';
 import { ArithmeticFunctionComponent } from '../customization/nodes/arithmetic-function-node /arithmetic-function-node.component';
-import { connection, node } from 'rete-area-3d-plugin/_types/extensions/forms';
 import { ValidationAlertService } from '../validation-alert/validation-alert.service';
-import { Alert } from '../validation-alert/validation-alert.interface';
+import { ThingNode } from './nodes/thing-node.class';
+import { ActionNode } from './nodes/action-node.class';
+import { PropertyNode } from './nodes/property-node.class';
+import { BasicFunctionNode } from './nodes/basic-function-node.class';
+import { ArithmeticFunctionNode } from './nodes/arithmetic-function-node.class';
 
 type Node = ThingNode | ActionNode | PropertyNode | BasicFunctionNode | ArithmeticFunctionNode;
 type Conn =
@@ -48,93 +49,6 @@ class Connection<A extends Node, B extends Node> extends Classic.Connection<
   A,
   B
 > { }
-
-class ThingNode extends Classic.Node {
-  width = 180;
-  height = 120;
-  thingId: string;
-  name: string;
-  constructor(name: string, thingId: string) {
-    super(name);
-    this.name = name;
-    this.thingId = thingId;
-    this.addOutput('value', new Classic.Output(socket));
-    return this;
-  }
-  getName() {
-    return this.name;
-  }
-}
-
-class ActionNode extends Classic.Node {
-  width = 180;
-  height = 120;
-  thingId: string;
-  name: string;
-  constructor(name: string, thingId: string) {
-    super(name);
-    this.name = name;
-    this.thingId = thingId;
-    this.addInput('in', new Classic.Input(socket));
-    this.addOutput('value', new Classic.Output(socket));
-    return this;
-  }
-  getName() {
-    return this.name;
-  }
-}
-
-class PropertyNode extends Classic.Node {
-  width = 180;
-  height = 120;
-  thingId: string;
-  name: string;
-  constructor(name: string, thingId: string) {
-    super(name);
-    this.name = name;
-    this.thingId = thingId;
-    this.addInput('in', new Classic.Input(socket));
-    this.addOutput('value', new Classic.Output(socket));
-    return this;
-  }
-  getName() {
-    return this.name;
-  }
-}
-
-class BasicFunctionNode extends Classic.Node {
-  width = 180;
-  height = 120;
-  thingId = '';
-  name: string;
-  constructor(name: string) {
-    super(name);
-    this.name = name;
-    this.addInput('in', new Classic.Input(socket));
-    this.addOutput('value', new Classic.Output(socket));
-    return this;
-  }
-  getName() {
-    return this.name;
-  }
-}
-
-class ArithmeticFunctionNode extends Classic.Node {
-  width = 180;
-  height = 120;
-  thingId = '';
-  name: string;
-  constructor(name: string) {
-    super(name);
-    this.name = name;
-    this.addInput('in', new Classic.Input(socket));
-    this.addOutput('value', new Classic.Output(socket));
-    return this;
-  }
-  getName() {
-    return this.name;
-  }
-}
 
 type AreaExtra = Area2D<Schemes> | AngularArea2D<Schemes> | ContextMenuExtra;
 
@@ -188,6 +102,7 @@ export async function createEditor(container: HTMLElement, injector: Injector, v
   angularRender.addPreset(AngularPresets.classic.setup());
   angularRender.addPreset(AngularPresets.contextMenu.setup());
 
+  // manage events
   editor.addPipe(context => {
     if (context.type == 'connectioncreated') {
       let connections = editor.getConnections();
@@ -259,18 +174,6 @@ export async function addArithmeticFunctionNode(name: string) {
   await editor.addNode(new ArithmeticFunctionNode(name));
 }
 
-function getConnectedNode(currentId: string, nodes: Node[], connections: Conn[]) {
-  const c = connections.find(conn => conn.source === currentId) || undefined;
-  if (c) {
-    return getNodeById(nodes, c.target);
-  } else {
-    return null;
-  }
-}
-
-function getFirstThingNode(nodes: Node[]) {
-  return nodes.find(node => node instanceof ThingNode) || null;
-}
 
 function getThingNodes(nodes: Node[]) {
   return nodes.filter(node => node instanceof ThingNode) || null;
@@ -282,7 +185,7 @@ function getNodeById(nodes: Node[], id: string) {
 
 // check that editor is not empty before code generation
 export function editorIsEmpty() {
-  return (getFirstThingNode(editor.getNodes()) == null);
+  return editor.getNodes().length == 0;
 }
 
 // recursive function to inspect next node in the flow
@@ -325,8 +228,7 @@ export function createAndroidCode(routineName: string, dataService: DataService)
   import com.example.wot_servient.wot.thing.property.ConsumedThingProperty;`;
   let thingIds: string[] = [];
 
-  // start from thing node
-  const node = getFirstThingNode(nodes);
+  // start from thing nodes
   const thingNodes = getThingNodes(nodes);
 
   // check if there is a thing node in the editor
