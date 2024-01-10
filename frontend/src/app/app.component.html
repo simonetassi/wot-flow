@@ -59,6 +59,13 @@
     color: white;
   }
 
+  #alerts {
+    position: fixed;
+    top: 1rem;
+    right: 1rem;
+    z-index: 99999;
+  }
+
   .rete {
     position: relative;
     width: 100%;
@@ -81,7 +88,6 @@
   .panel {
     width: 15rem;
   }
-
 
   /* Aggiungi media queries */
   @media only screen and (min-device-height: 414px) and (max-device-height: 896px) and (orientation: portrait) {
@@ -167,13 +173,14 @@
             (click)="onAddBasicFunctionNode('observeProperty')">observeProperty</button>
           <button mat-button class="basic-function-btn"
             (click)="onAddBasicFunctionNode('invokeAction')">invokeAction</button>
-          <button mat-button class="arithmetic-function-btn" 
-          (click)="onAddArithmeticFunctionNode('average')">average</button>
+          <button mat-button class="arithmetic-function-btn"
+            (click)="onAddArithmeticFunctionNode('average')">average</button>
         </ng-template>
       </mat-expansion-panel>
     </mat-nav-list>
   </mat-drawer>
   <mat-drawer-content>
+    <div id="alerts"></div>
     <button (click)="drawer.toggle();" mat-icon-button class="child" id="expand-btn">
       <mat-icon>keyboard_arrow_right</mat-icon>
     </button>

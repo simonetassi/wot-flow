@@ -33,6 +33,9 @@ import { BasicFunctionNodeComponent } from './customization/nodes/basic-function
 import { ArithmeticFunctionComponent } from './customization/nodes/arithmetic-function-node /arithmetic-function-node.component';
 import { ThingExpandableComponent } from './thing-expandable/thing-expandable.component';
 import { DialogHandlerButton, RoutineNameDialogComponent } from './routine-name-dialog/routine-name-dialog.component';
+import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
+import { ValidationAlertComponent } from './validation-alert/validation-alert.component';
+import { ValidationAlertService } from './validation-alert/validation-alert.service';
 
 
 @NgModule({
@@ -48,12 +51,13 @@ import { DialogHandlerButton, RoutineNameDialogComponent } from './routine-name-
     ArithmeticFunctionComponent,
     ThingExpandableComponent,
     RoutineNameDialogComponent,
-    DialogHandlerButton
+    DialogHandlerButton,
+    ValidationAlertComponent
   ],
   imports: [BrowserModule, ReteModule, BrowserAnimationsModule, MatButtonModule, MatIconModule, MatSidenavModule,
     MatToolbarModule, MatMenuModule, MatListModule, MatExpansionModule, HttpClientModule, MatFormFieldModule,
-    MatInputModule, FormsModule, MatDialogModule],
-  providers: [],
+    MatInputModule, FormsModule, MatDialogModule, NgbModule],
+  providers: [ValidationAlertService],
   bootstrap: [AppComponent],
 })
 export class AppModule { }

@@ -33,6 +33,8 @@ import { ThingNodeComponent } from '../customization/nodes/thing-node/thing-node
 import { BasicFunctionNodeComponent } from '../customization/nodes/basic-function-node/basic-function-node.component';
 import { ArithmeticFunctionComponent } from '../customization/nodes/arithmetic-function-node /arithmetic-function-node.component';
 import { connection, node } from 'rete-area-3d-plugin/_types/extensions/forms';
+import { ValidationAlertService } from '../validation-alert/validation-alert.service';
+import { Alert } from '../validation-alert/validation-alert.interface';
 
 type Node = ThingNode | ActionNode | PropertyNode | BasicFunctionNode | ArithmeticFunctionNode;
 type Conn =
@@ -116,7 +118,7 @@ const editor = new NodeEditor<Schemes>();
 const arrange = new AutoArrangePlugin<Schemes>();
 arrange.addPreset(ArrangePresets.classic.setup());
 
-export async function createEditor(container: HTMLElement, injector: Injector) {
+export async function createEditor(container: HTMLElement, injector: Injector, validationAlertService: ValidationAlertService) {
   const area = new AreaPlugin<Schemes, AreaExtra>(container);
   const connection = new ConnectionPlugin<Schemes, AreaExtra>();
   const angularRender = new AngularPlugin<Schemes, AreaExtra>({ injector });
@@ -162,21 +164,26 @@ export async function createEditor(container: HTMLElement, injector: Injector) {
   angularRender.addPreset(AngularPresets.contextMenu.setup());
 
   editor.addPipe(context => {
-    if(context.type == 'connectioncreated'){
+    if (context.type == 'connectioncreated') {
       let connections = editor.getConnections();
       let nodes = editor.getNodes();
-      let last = connections[(connections.length-1)]
+      let last = connections[(connections.length - 1)];
       let srcNode = nodes.find(node => last.source == node.id);
       let targetNode = nodes.find(node => last.target == node.id);
 
       // using ${connection.length} as random value for the input/output key
       // TODO implement smarter solution
-      if(srcNode instanceof ThingNode){
+      if (srcNode instanceof ThingNode) {
         srcNode.addOutput(`value${connections.length}`, new Classic.Output(socket));
         area.update('node', srcNode.id);
-      } else if (targetNode instanceof ArithmeticFunctionNode){
-        targetNode.addInput(`in${connections.length}`, new Classic.Input(socket))
+      } else if (targetNode instanceof ArithmeticFunctionNode) {
+        targetNode.addInput(`in${connections.length}`, new Classic.Input(socket));
         area.update('node', targetNode.id);
+      }
+    } else if (context.type === 'connectioncreate') {
+      if (!canCreateConnection(context.data)) {
+        validationAlertService.showAlert({ type: 'danger', message: `This connection is NOT possible` });
+        return;
       }
     }
     return context
@@ -189,8 +196,20 @@ export async function createEditor(container: HTMLElement, injector: Injector) {
   });
 
   return {
-    destroy: () => area.destroy()
+    destroy: () => area.destroy(),
   };
+}
+
+function canCreateConnection(connection: Conn): boolean {
+  let nodes = editor.getNodes();
+  let srcNode = nodes.find(node => connection.source == node.id);
+  let targetNode = nodes.find(node => connection.target == node.id);
+  // Thing -> Action ||  Thing -> Property
+  return ((srcNode instanceof ThingNode) && ((targetNode instanceof ActionNode) || (targetNode instanceof PropertyNode)))
+    // Action -> BasicFunction || Property -> BasicFunction
+    || (((srcNode instanceof ActionNode) || (srcNode instanceof PropertyNode)) && (targetNode instanceof BasicFunctionNode))
+    // BasicFunction -> ArithmeticFunction
+    || ((srcNode instanceof BasicFunctionNode) && (targetNode instanceof ArithmeticFunctionNode));
 }
 
 
@@ -233,7 +252,7 @@ function getNodeById(nodes: Node[], id: string) {
 }
 
 // check that editor is not empty before code generation
-export function editorIsEmpty(){
+export function editorIsEmpty() {
   return (getFirstThingNode(editor.getNodes()) == null);
 }
 
@@ -276,7 +295,7 @@ export function createAndroidCode(routineName: string, dataService: DataService)
 
   // check if there is a thing node in the editor
   if (node != null) {
-    const thingId : string = node.thingId;
+    const thingId: string = node.thingId;
     thingIds.push(thingId);
 
     const toInject = inspectNextNode(node.id, nodes, connections, ``);
