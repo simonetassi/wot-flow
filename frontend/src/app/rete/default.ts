@@ -53,11 +53,16 @@ class ThingNode extends Classic.Node {
   width = 180;
   height = 120;
   thingId: string;
-  constructor(initial: string, thingId: string) {
-    super(initial);
+  name: string;
+  constructor(name: string, thingId: string) {
+    super(name);
+    this.name = name;
     this.thingId = thingId;
     this.addOutput('value', new Classic.Output(socket));
     return this;
+  }
+  getName() {
+    return this.name;
   }
 }
 
@@ -65,12 +70,17 @@ class ActionNode extends Classic.Node {
   width = 180;
   height = 120;
   thingId: string;
-  constructor(initial: string, thingId: string) {
-    super(initial);
+  name: string;
+  constructor(name: string, thingId: string) {
+    super(name);
+    this.name = name;
     this.thingId = thingId;
     this.addInput('in', new Classic.Input(socket));
     this.addOutput('value', new Classic.Output(socket));
     return this;
+  }
+  getName() {
+    return this.name;
   }
 }
 
@@ -78,12 +88,17 @@ class PropertyNode extends Classic.Node {
   width = 180;
   height = 120;
   thingId: string;
-  constructor(initial: string, thingId: string) {
-    super(initial);
+  name: string;
+  constructor(name: string, thingId: string) {
+    super(name);
+    this.name = name;
     this.thingId = thingId;
     this.addInput('in', new Classic.Input(socket));
     this.addOutput('value', new Classic.Output(socket));
     return this;
+  }
+  getName() {
+    return this.name;
   }
 }
 
@@ -91,11 +106,16 @@ class BasicFunctionNode extends Classic.Node {
   width = 180;
   height = 120;
   thingId = '';
-  constructor(initial: string) {
-    super(initial);
+  name: string;
+  constructor(name: string) {
+    super(name);
+    this.name = name;
     this.addInput('in', new Classic.Input(socket));
     this.addOutput('value', new Classic.Output(socket));
     return this;
+  }
+  getName() {
+    return this.name;
   }
 }
 
@@ -103,11 +123,16 @@ class ArithmeticFunctionNode extends Classic.Node {
   width = 180;
   height = 120;
   thingId = '';
-  constructor(initial: string) {
-    super(initial);
+  name: string;
+  constructor(name: string) {
+    super(name);
+    this.name = name;
     this.addInput('in', new Classic.Input(socket));
     this.addOutput('value', new Classic.Output(socket));
     return this;
+  }
+  getName() {
+    return this.name;
   }
 }
 
@@ -247,6 +272,10 @@ function getFirstThingNode(nodes: Node[]) {
   return nodes.find(node => node instanceof ThingNode) || null;
 }
 
+function getThingNodes(nodes: Node[]) {
+  return nodes.filter(node => node instanceof ThingNode) || null;
+}
+
 function getNodeById(nodes: Node[], id: string) {
   return nodes.find(node => node.id === id) || null;
 }
@@ -257,26 +286,30 @@ export function editorIsEmpty() {
 }
 
 // recursive function to inspect next node in the flow
-function inspectNextNode(currentId: string, nodes: Node[], connections: Conn[], code: string): string {
-  const c = connections.find(conn => conn.source === currentId) || undefined;
-  if (c) {
+function inspectNextNode(currentId: string, nodes: Node[], connections: Conn[], code: string, name: string): string {
+  const conns = connections.filter(conn => conn.source === currentId);
+
+  for (const c of conns) {
     const connectedNode = getNodeById(nodes, c.target);
+
     if (connectedNode == null) {
       console.log("ERROR! No more connections");
     } else if (connectedNode instanceof ActionNode) {
-      code += `ConsumedThingAction action = consumedThing.getAction("${connectedNode.label}");`;
+      code += `ConsumedThingAction action_${connectedNode.label} = consumedThing_${name}.getAction("${connectedNode.label}");`;
     } else if (connectedNode instanceof PropertyNode) {
-      code += `ConsumedThingProperty property = consumedThing.getProperty("${connectedNode.label}");`;
+      code += `ConsumedThingProperty property_${connectedNode.label} = consumedThing_${name}.getProperty("${connectedNode.label}");`;
     } else if (connectedNode.label == 'invokeAction') {
-      code += `action.invoke();`
+      code += `action_${name}.invoke();`;
     } else if (connectedNode.label == 'observeProperty') {
-      code += `property.read();`
+      code += `property_${name}.read();`;
     }
-    return inspectNextNode(connectedNode!.id, nodes, connections, code);
-  } else {
-    return code;
+
+    code = inspectNextNode(connectedNode!.id, nodes, connections, code, connectedNode!.label);
   }
+
+  return code;
 }
+
 
 export function createAndroidCode(routineName: string, dataService: DataService) {
   const nodes = editor.getNodes();
@@ -287,31 +320,32 @@ export function createAndroidCode(routineName: string, dataService: DataService)
   // se si passare l'handling operaz algebrica a funz dedicata
   // altrimenti creare qui codice semplice (thing-property/thing-action)  
 
-  let code = ``;
+  let code = `import com.example.wot_servient.wot.thing.ConsumedThing;
+  import com.example.wot_servient.wot.thing.action.ConsumedThingAction;
+  import com.example.wot_servient.wot.thing.property.ConsumedThingProperty;`;
   let thingIds: string[] = [];
 
   // start from thing node
   const node = getFirstThingNode(nodes);
+  const thingNodes = getThingNodes(nodes);
 
   // check if there is a thing node in the editor
-  if (node != null) {
-    const thingId: string = node.thingId;
-    thingIds.push(thingId);
+  if (thingNodes.length != 0) {
+    for (let n of thingNodes) {
+      const thingId: string = n.thingId;
+      thingIds.push(thingId);
+      let thingName = n.label.replace(/[^A-Z0-9]+/ig, "_");
 
-    const toInject = inspectNextNode(node.id, nodes, connections, ``);
+      const toInject = inspectNextNode(n.id, nodes, connections, ``, thingName);
 
-    code += `
-              import com.example.wot_servient.wot.thing.ConsumedThing;
-              import com.example.wot_servient.wot.thing.action.ConsumedThingAction;
-              import com.example.wot_servient.wot.thing.property.ConsumedThingProperty;
-              ConsumedThing consumedThing = consumedThingsMap.get("${thingId}");
-              if (consumedThing != null) {
+      code += `ConsumedThing consumedThing_${thingName} = consumedThingsMap.get("${thingId}");
+              if (consumedThing_${thingName} != null) {
                     ${toInject}
               } else {
                   System.out.println("RUNTIME ERROR: Thing not found.");
               }
             `
-
+    }
   } else {
     console.log("ERROR! No Thing Nodes in the editor")
   }
