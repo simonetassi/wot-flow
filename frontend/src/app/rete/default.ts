@@ -221,11 +221,11 @@ function inspectNextNode(currentId: string, nodes: Node[], connections: Conn[], 
       const [arithmetic, label] = nextIsArithmeticFunction(connectedNode, connections, nodes);
       if (arithmetic) {
         code += `String string_${name} = property_${name}.read().get().toString();
-                 Float numeric_${name} = isNumeric(string_${name});
+                 Float numeric_${name} = instance.isNumeric(string_${name});
                  if(numeric_${name} != -777){
                     ${label}_properties.add(numeric_${name});
                  } else {
-                  System.out.println("ERROR, ${name} is not a numeric property!")
+                  System.out.println("ERROR, ${name} is not a numeric property!");
                  }`;
       } else {
         code += `System.out.println(property_${name}.read().get().toString());`;
@@ -258,7 +258,7 @@ export function createAndroidCode(routineName: string, dataService: DataService)
 
   if ((arithmeticFunctionNodes.length != 0) && (thingNodes.length != 0)) {
     for (let n of arithmeticFunctionNodes) {
-      code += `ArrayList<Float> ${n.label}_properties = new ArrayList()<>;`;
+      code += `List ${n.label}_properties = new ArrayList();`;
     }
   }
 
@@ -286,7 +286,7 @@ export function createAndroidCode(routineName: string, dataService: DataService)
   if ((arithmeticFunctionNodes.length != 0) && (thingNodes.length != 0)) {
     for (let n of arithmeticFunctionNodes) {
       // might not work properly: consider using an if else for every type of operation
-      code += `${n.label}_properties.stream().${n.label}().orElse(Double.NaN)`;
+      code += `${n.label}_properties.stream().${n.label}().orElse(Double.NaN);`;
     }
   }
 
