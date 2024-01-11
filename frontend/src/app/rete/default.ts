@@ -179,6 +179,10 @@ function getThingNodes(nodes: Node[]) {
   return nodes.filter(node => node instanceof ThingNode) || null;
 }
 
+function getArithmeticFunctionNodes(nodes: Node[]) {
+  return nodes.filter(node => node instanceof ArithmeticFunctionNode) || null;
+}
+
 function getNodeById(nodes: Node[], id: string) {
   return nodes.find(node => node.id === id) || null;
 }
@@ -186,6 +190,16 @@ function getNodeById(nodes: Node[], id: string) {
 // check that editor is not empty before code generation
 export function editorIsEmpty() {
   return editor.getNodes().length == 0;
+}
+
+function nextIsArithmeticFunction(node: BasicFunctionNode, connections: Conn[], nodes: Node[]) {
+  const c = connections.find(conn => conn.source === node.id) || null;
+  if ((c != null) && (getNodeById(nodes, c.target) instanceof ArithmeticFunctionNode)) {
+    const connectedNode = getNodeById(nodes, c.target);
+    return [true, connectedNode!.label];
+  } else {
+    return [false, ''];
+  }
 }
 
 // recursive function to inspect next node in the flow
@@ -204,7 +218,18 @@ function inspectNextNode(currentId: string, nodes: Node[], connections: Conn[], 
     } else if (connectedNode.label == 'invokeAction') {
       code += `action_${name}.invoke();`;
     } else if (connectedNode.label == 'observeProperty') {
-      code += `property_${name}.read();`;
+      const [arithmetic, label] = nextIsArithmeticFunction(connectedNode, connections, nodes);
+      if (arithmetic) {
+        code += `String string_${name} = property_${name}.read().get().toString();
+                 Float numeric_${name} = isNumeric(string_${name});
+                 if(numeric_${name} != -777){
+                    ${label}_properties.add(numeric_${name});
+                 } else {
+                  System.out.println("ERROR, ${name} is not a numeric property!")
+                 }`;
+      } else {
+        code += `System.out.println(property_${name}.read().get().toString());`;
+      }
     }
 
     code = inspectNextNode(connectedNode!.id, nodes, connections, code, connectedNode!.label);
@@ -228,8 +253,14 @@ export function createAndroidCode(routineName: string, dataService: DataService)
   import com.example.wot_servient.wot.thing.property.ConsumedThingProperty;`;
   let thingIds: string[] = [];
 
-  // start from thing nodes
+  const arithmeticFunctionNodes = getArithmeticFunctionNodes(nodes);
   const thingNodes = getThingNodes(nodes);
+
+  if ((arithmeticFunctionNodes.length != 0) && (thingNodes.length != 0)) {
+    for (let n of arithmeticFunctionNodes) {
+      code += `ArrayList<Float> ${n.label}_properties = new ArrayList()<>;`;
+    }
+  }
 
   // check if there is a thing node in the editor
   if (thingNodes.length != 0) {
@@ -252,8 +283,16 @@ export function createAndroidCode(routineName: string, dataService: DataService)
     console.log("ERROR! No Thing Nodes in the editor")
   }
 
+  if ((arithmeticFunctionNodes.length != 0) && (thingNodes.length != 0)) {
+    for (let n of arithmeticFunctionNodes) {
+      // might not work properly: consider using an if else for every type of operation
+      code += `${n.label}_properties.stream().${n.label}().orElse(Double.NaN)`;
+    }
+  }
+
   const routine = new Routine("", routineName, code, JSON.stringify(thingIds));
   dataService.postRoutine(routine).subscribe(response => {
     location.reload();
   });
+
 }

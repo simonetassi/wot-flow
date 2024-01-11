@@ -10,7 +10,6 @@ export class ArithmeticFunctionNode extends Classic.Node {
         super(name);
         this.name = name;
         this.addInput('in', new Classic.Input(socket));
-        this.addOutput('value', new Classic.Output(socket));
         return this;
     }
 }
