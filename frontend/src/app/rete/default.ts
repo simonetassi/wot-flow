@@ -286,7 +286,7 @@ export function createAndroidCode(routineName: string, dataService: DataService)
   if ((arithmeticFunctionNodes.length != 0) && (thingNodes.length != 0)) {
     for (let n of arithmeticFunctionNodes) {
       // might not work properly: consider using an if else for every type of operation
-      code += `${n.label}_properties.stream().${n.label}().orElse(Double.NaN);`;
+      code += `Float ${n.label} = instance.${n.label}(${n.label}_properties);`;
     }
   }
 
