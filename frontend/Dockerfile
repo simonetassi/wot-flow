@@ -2,7 +2,7 @@
 FROM node:lts-alpine AS development
 
 # Set the working directory
-WORKDIR /thomas/frontend/src/app
+WORKDIR /wot-flow/frontend/src/app
 # Copy package.json and package-lock.json to the working directory
 COPY package*.json ./
 

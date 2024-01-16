@@ -10,6 +10,9 @@ COPY package*.json ./
 # Install deps inside container
 RUN npm install
 
+# Copy the rest of the application
+COPY . .
+
 RUN npm run build
 
 EXPOSE 3001
@@ -24,7 +27,7 @@ ARG NODE_ENV=production
 ENV NODE_ENV=${NODE_ENV}
 
 # Set work dir
-WORKDIR /thomas/src/app
+WORKDIR /wot-flow/src/app
 
 COPY --from=development /wot-flow/src/app/ .
 
@@ -32,5 +35,3 @@ EXPOSE 3001
 
 # run app
 CMD [ "node", "dist/main"]
-
-
