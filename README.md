@@ -13,6 +13,12 @@ DATABASE_URL='<your_db_string>'
 ...
 ```
 
+To run the Zion TDD on `localhost:3000` start Docker and run:
+```
+cd zion
+docker compose up
+```
+
 To run the frontend on `localhost:4200` run:
 ```
 cd frontend
