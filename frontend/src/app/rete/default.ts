@@ -219,16 +219,17 @@ function inspectNextNode(currentId: string, nodes: Node[], connections: Conn[], 
       code += `action_${name}.invoke();`;
     } else if (connectedNode.label == 'observeProperty') {
       const [arithmetic, label] = nextIsArithmeticFunction(connectedNode, connections, nodes);
+      code += `String string_${name} = property_${name}.read().get().toString();`
       if (arithmetic) {
-        code += `String string_${name} = property_${name}.read().get().toString();
-                 Float numeric_${name} = instance.isNumeric(string_${name});
+        code += `Float numeric_${name} = instance.isNumeric(string_${name});
                  if(numeric_${name} != -777){
                     ${label}_properties.add(numeric_${name});
                  } else {
                   System.out.println("ERROR, ${name} is not a numeric property!");
                  }`;
       } else {
-        code += `System.out.println(property_${name}.read().get().toString());`;
+        code += `properties.put(${name}, string_${name});
+        System.out.println(string_${name});`;
       }
     }
 
@@ -241,12 +242,7 @@ function inspectNextNode(currentId: string, nodes: Node[], connections: Conn[], 
 
 export function createAndroidCode(routineName: string, dataService: DataService) {
   const nodes = editor.getNodes();
-  const connections = editor.getConnections();
-
-  // TODO quando verranno aggiunte operazioni algebriche
-  // prima di tutto controllare se ci sono operazioni algebriche
-  // se si passare l'handling operaz algebrica a funz dedicata
-  // altrimenti creare qui codice semplice (thing-property/thing-action)  
+  const connections = editor.getConnections(); 
 
   let code = `import com.example.wot_servient.wot.thing.ConsumedThing;
   import com.example.wot_servient.wot.thing.action.ConsumedThingAction;
@@ -255,6 +251,8 @@ export function createAndroidCode(routineName: string, dataService: DataService)
 
   const arithmeticFunctionNodes = getArithmeticFunctionNodes(nodes);
   const thingNodes = getThingNodes(nodes);
+
+  code += `Map properties = new HashMap();`;
 
   if ((arithmeticFunctionNodes.length != 0) && (thingNodes.length != 0)) {
     for (let n of arithmeticFunctionNodes) {
