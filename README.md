@@ -44,7 +44,8 @@ The frontend proxying is currently set for the docker-compose deploying, to use 
 To run the Zion TDD on `localhost:3000` start Docker and run:
 ```
 cd zion
-docker compose up
+npm ci
+npm start
 ```
 
 To run the frontend on `localhost:4200` run:
