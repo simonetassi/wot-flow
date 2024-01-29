@@ -228,7 +228,7 @@ function inspectNextNode(currentId: string, nodes: Node[], connections: Conn[], 
                   System.out.println("ERROR, ${name} is not a numeric property!");
                  }`;
       } else {
-        code += `properties.put(${name}, string_${name});
+        code += `properties.put("${name}", string_${name});
         System.out.println(string_${name});`;
       }
     }
