@@ -33,8 +33,16 @@ export class ThingExpandableComponent implements OnInit {
     );
   }
 
+  trackByAction(index: number, action: [string, Object]): string {
+    return action[0]; // Use a unique identifier from your action, adjust accordingly
+  }
+
   getObjectKeys(obj: any): string[] {
     return Object.keys(obj);
+  }
+
+  getObjectEntries(obj: any): [string, Object][] {
+    return Object.entries(obj);
   }
 
   onAddThingNode(thingName: string, thingId: string) {
@@ -42,9 +50,9 @@ export class ThingExpandableComponent implements OnInit {
     addThingNode(thingName, thingId);
   }
 
-  onAddActionNode(actionName: string, thingId: string) {
+  onAddActionNode(action: [string, Object], thingId: string) {
     // Call the addActionNode function from createEditor
-    addActionNode(actionName, thingId);
+    addActionNode(action, thingId);
   }
 
   onAddPropertyNode(propertyName: string, thingId: string) {

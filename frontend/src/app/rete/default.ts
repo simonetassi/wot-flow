@@ -10,6 +10,7 @@ import {
 import {
   AngularPlugin,
   AngularArea2D,
+  ControlComponent,
   Presets as AngularPresets,
 } from 'rete-angular-plugin/14';
 
@@ -36,6 +37,7 @@ import { ActionNode } from './nodes/action-node.class';
 import { PropertyNode } from './nodes/property-node.class';
 import { BasicFunctionNode } from './nodes/basic-function-node.class';
 import { ArithmeticFunctionNode } from './nodes/arithmetic-function-node.class';
+import { DropDownComponent, DropDownControl } from '../custom-dropdown/custom-dropdown.component';
 
 type Node = ThingNode | ActionNode | PropertyNode | BasicFunctionNode | ArithmeticFunctionNode;
 type Conn =
@@ -82,6 +84,12 @@ export async function createEditor(container: HTMLElement, injector: Injector, v
             return ArithmeticFunctionComponent;
           }
           return ThingNodeComponent;
+        },
+        control(data) {
+          if (data.payload instanceof DropDownControl) {
+            return DropDownComponent;
+          }
+          return ControlComponent;
         }
       },
     })
@@ -158,8 +166,16 @@ export async function addThingNode(thingName: string, thingId: string) {
   await editor.addNode(new ThingNode(thingName, thingId));
 }
 
-export async function addActionNode(actionName: string, thingId: string) {
-  await editor.addNode(new ActionNode(actionName, thingId));
+export async function addActionNode(action: [string, Object], thingId: string) {
+  const a = new ActionNode(action[0], thingId);
+
+  if(Object.keys(action[1]).includes("input")){
+    const input = Object.entries(action[1]).find(pair => pair[0] == "input");
+    const e : string[] = Object.values(input![1])[0] as string[];
+    a.addControl("select", new DropDownControl(e));
+  }
+
+  await editor.addNode(a);
 }
 
 export async function addPropertyNode(propertyName: string, thingId: string) {
@@ -242,7 +258,7 @@ function inspectNextNode(currentId: string, nodes: Node[], connections: Conn[], 
 
 export function createAndroidCode(routineName: string, dataService: DataService) {
   const nodes = editor.getNodes();
-  const connections = editor.getConnections(); 
+  const connections = editor.getConnections();
 
   let code = `import com.example.wot_servient.wot.thing.ConsumedThing;
   import com.example.wot_servient.wot.thing.action.ConsumedThingAction;
