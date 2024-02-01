@@ -37,7 +37,7 @@ import { ActionNode } from './nodes/action-node.class';
 import { PropertyNode } from './nodes/property-node.class';
 import { BasicFunctionNode } from './nodes/basic-function-node.class';
 import { ArithmeticFunctionNode } from './nodes/arithmetic-function-node.class';
-import { DropDownComponent, DropDownControl } from '../custom-dropdown/custom-dropdown.component';
+import { CustomDropDownComponent, CustomDropDownControl } from '../custom-dropdown/custom-dropdown.component';
 
 type Node = ThingNode | ActionNode | PropertyNode | BasicFunctionNode | ArithmeticFunctionNode;
 type Conn =
@@ -86,8 +86,8 @@ export async function createEditor(container: HTMLElement, injector: Injector, v
           return ThingNodeComponent;
         },
         control(data) {
-          if (data.payload instanceof DropDownControl) {
-            return DropDownComponent;
+          if (data.payload instanceof CustomDropDownControl) {
+            return CustomDropDownComponent;
           }
           return ControlComponent;
         }
@@ -172,7 +172,7 @@ export async function addActionNode(action: [string, Object], thingId: string) {
   if(Object.keys(action[1]).includes("input")){
     const input = Object.entries(action[1]).find(pair => pair[0] == "input");
     const e : string[] = Object.values(input![1])[0] as string[];
-    a.addControl("select", new DropDownControl(e));
+    a.addControl("select", new CustomDropDownControl(e));
   }
 
   await editor.addNode(a);

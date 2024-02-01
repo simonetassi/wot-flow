@@ -1,7 +1,7 @@
 import { Component, Input } from "@angular/core";
 import { ClassicPreset } from "rete";
 
-export class DropDownControl extends ClassicPreset.Control {
+export class CustomDropDownControl extends ClassicPreset.Control {
   constructor(public select: string[]) {
     super();
   }
@@ -10,8 +10,9 @@ export class DropDownControl extends ClassicPreset.Control {
 @Component({
   selector: "app-custom-dropdown",
   templateUrl: './custom-dropdown.component.html',
+  styleUrls: ['./custom-dropdown.component.css']
 })
-export class DropDownComponent {
-  @Input() data!: DropDownControl;
+export class CustomDropDownComponent {
+  @Input() data!: CustomDropDownControl;
 }
 
