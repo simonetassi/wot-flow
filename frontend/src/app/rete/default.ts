@@ -175,12 +175,13 @@ export async function addThingNode(thingName: string, thingId: string) {
   await editor.addNode(new ThingNode(thingName, thingId));
 }
 
-export async function addActionNode(action: [string, Object], thingId: string, value? : string) {
+export async function addActionNode(action: [string, Object], thingId: string, value?: string) {
   if (Object.keys(action[1]).includes("input")) {
     // await editor.addNode(new ActionInputNode(action, thingId));
     const n = new ActionNode(action[0], thingId);
     n.setValue(value!);
-    await editor.addNode(n);    
+    n.addControl('value', new Classic.InputControl("text", { readonly: true, initial: value! }))
+    await editor.addNode(n);
   } else {
     await editor.addNode(new ActionNode(action[0], thingId));
   }
@@ -239,7 +240,7 @@ function nextIsArithmeticFunction(node: BasicFunctionNode, connections: Conn[], 
 
 function lastWasActionInput(node: BasicFunctionNode, connections: Conn[], nodes: Node[]) {
   const c = connections.find(conn => conn.target === node.id) || null;
-  if ((c != null) && ((getNodeById(nodes, c.source) as ActionNode).value != undefined )) {
+  if ((c != null) && ((getNodeById(nodes, c.source) as ActionNode).value != undefined)) {
     const connectedNode = getNodeById(nodes, c.source) as ActionNode;
     console.log(connectedNode.value);
     return [true, connectedNode.value];
