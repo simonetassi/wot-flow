@@ -37,6 +37,7 @@ import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
 import { ValidationAlertComponent } from './validation-alert/validation-alert.component';
 import { ValidationAlertService } from './validation-alert/validation-alert.service';
 import { CustomDropDownComponent } from './custom-dropdown/custom-dropdown.component';
+import { ActionInputDialogComponent } from './action-input-dialog/action-input-dialog.component';
 
 
 @NgModule({
@@ -54,7 +55,8 @@ import { CustomDropDownComponent } from './custom-dropdown/custom-dropdown.compo
     RoutineNameDialogComponent,
     DialogHandlerButton,
     ValidationAlertComponent,
-    CustomDropDownComponent
+    CustomDropDownComponent,
+    ActionInputDialogComponent,
   ],
   imports: [BrowserModule, ReteModule, BrowserAnimationsModule, MatButtonModule, MatIconModule, MatSidenavModule,
     MatToolbarModule, MatMenuModule, MatListModule, MatExpansionModule, HttpClientModule, MatFormFieldModule,

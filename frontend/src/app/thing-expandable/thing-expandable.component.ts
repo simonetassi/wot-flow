@@ -1,10 +1,11 @@
 import { Component, OnInit } from '@angular/core';
-import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
 import { DataService } from '../data.service';
 
 import { addThingNode } from '../rete/default';
 import { addActionNode } from '../rete/default';
 import { addPropertyNode } from '../rete/default';
+import { MatDialog } from '@angular/material/dialog';
+import { ActionInputDialogComponent } from '../action-input-dialog/action-input-dialog.component';
 
 interface Thing {
   id: string;
@@ -22,7 +23,7 @@ interface Thing {
 export class ThingExpandableComponent implements OnInit {
   data: Thing[] = [];
 
-  constructor(private sanitizer: DomSanitizer, private dataService: DataService) { }
+  constructor(private dialog: MatDialog, private dataService: DataService) { }
 
   ngOnInit() {
     // http get from zion
@@ -51,8 +52,21 @@ export class ThingExpandableComponent implements OnInit {
   }
 
   onAddActionNode(action: [string, Object], thingId: string) {
-    // Call the addActionNode function from createEditor
-    addActionNode(action, thingId);
+    // if input is needed, insert it from dialog
+    if (Object.keys(action[1]).includes("input")) {
+      const dialogRef = this.dialog.open(ActionInputDialogComponent, {
+        data: { value: '' },
+      });
+
+      dialogRef.afterClosed().subscribe(result => {
+        if (result) {
+          addActionNode(action, thingId, result);
+        }
+      });
+    } else {
+      // Call the addActionNode function from createEditor
+      addActionNode(action, thingId);
+    }
   }
 
   onAddPropertyNode(propertyName: string, thingId: string) {

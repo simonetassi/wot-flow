@@ -25,6 +25,8 @@ import {
   Presets as ArrangePresets
 } from "rete-auto-arrange-plugin";
 
+import { DataflowEngine } from "rete-engine";
+
 import { DataService, Routine } from '../data.service';
 import { ActionNodeComponent } from '../customization/nodes/action-node/action-node.component';
 import { PropertyNodeComponent } from '../customization/nodes/property-node/property-node.component';
@@ -38,13 +40,16 @@ import { PropertyNode } from './nodes/property-node.class';
 import { BasicFunctionNode } from './nodes/basic-function-node.class';
 import { ArithmeticFunctionNode } from './nodes/arithmetic-function-node.class';
 import { CustomDropDownComponent, CustomDropDownControl } from '../custom-dropdown/custom-dropdown.component';
+import { ActionInputNode } from './nodes/action-input-node.class';
 
-type Node = ThingNode | ActionNode | PropertyNode | BasicFunctionNode | ArithmeticFunctionNode;
+type Node = ThingNode | ActionNode | ActionInputNode | PropertyNode | BasicFunctionNode | ArithmeticFunctionNode;
 type Conn =
   | Connection<ThingNode, PropertyNode>
   | Connection<ThingNode, ActionNode>
+  | Connection<ThingNode, ActionInputNode>
   | Connection<PropertyNode, BasicFunctionNode>
-  | Connection<ActionNode, BasicFunctionNode>;
+  | Connection<ActionNode, BasicFunctionNode>
+  | Connection<ActionInputNode, BasicFunctionNode>;
 type Schemes = GetSchemes<Node, Conn>;
 
 class Connection<A extends Node, B extends Node> extends Classic.Connection<
@@ -75,6 +80,8 @@ export async function createEditor(container: HTMLElement, injector: Injector, v
       customize: {
         node(context) {
           if (context.payload instanceof ActionNode) {
+            return ActionNodeComponent;
+          } else if (context.payload instanceof ActionInputNode) {
             return ActionNodeComponent;
           } else if (context.payload instanceof PropertyNode) {
             return PropertyNodeComponent;
@@ -153,9 +160,11 @@ function canCreateConnection(connection: Conn): boolean {
   let srcNode = nodes.find(node => connection.source == node.id);
   let targetNode = nodes.find(node => connection.target == node.id);
   // Thing -> Action ||  Thing -> Property
-  return ((srcNode instanceof ThingNode) && ((targetNode instanceof ActionNode) || (targetNode instanceof PropertyNode)))
+  return ((srcNode instanceof ThingNode) && ((targetNode instanceof ActionNode) || (targetNode instanceof ActionInputNode)
+    || (targetNode instanceof PropertyNode)))
     // Action -> BasicFunction || Property -> BasicFunction
-    || (((srcNode instanceof ActionNode) || (srcNode instanceof PropertyNode)) && (targetNode instanceof BasicFunctionNode))
+    || (((srcNode instanceof ActionNode) || (srcNode instanceof ActionInputNode) || (srcNode instanceof PropertyNode))
+      && (targetNode instanceof BasicFunctionNode))
     // BasicFunction -> ArithmeticFunction
     || ((srcNode instanceof BasicFunctionNode) && (targetNode instanceof ArithmeticFunctionNode));
 }
@@ -166,16 +175,15 @@ export async function addThingNode(thingName: string, thingId: string) {
   await editor.addNode(new ThingNode(thingName, thingId));
 }
 
-export async function addActionNode(action: [string, Object], thingId: string) {
-  const a = new ActionNode(action[0], thingId);
-
-  if(Object.keys(action[1]).includes("input")){
-    const input = Object.entries(action[1]).find(pair => pair[0] == "input");
-    const e : string[] = Object.values(input![1])[0] as string[];
-    a.addControl("select", new CustomDropDownControl(e));
+export async function addActionNode(action: [string, Object], thingId: string, value? : string) {
+  if (Object.keys(action[1]).includes("input")) {
+    // await editor.addNode(new ActionInputNode(action, thingId));
+    const n = new ActionNode(action[0], thingId);
+    n.setValue(value!);
+    await editor.addNode(n);    
+  } else {
+    await editor.addNode(new ActionNode(action[0], thingId));
   }
-
-  await editor.addNode(a);
 }
 
 export async function addPropertyNode(propertyName: string, thingId: string) {
@@ -218,6 +226,29 @@ function nextIsArithmeticFunction(node: BasicFunctionNode, connections: Conn[], 
   }
 }
 
+// function lastWasActionInput(node: BasicFunctionNode, connections: Conn[], nodes: Node[]) {
+//   const c = connections.find(conn => conn.target === node.id) || null;
+//   if ((c != null) && (getNodeById(nodes, c.source) instanceof ActionInputNode)) {
+//     const connectedNode = getNodeById(nodes, c.target) as ActionInputNode;
+//     console.log(connectedNode.val);
+//     return [true, connectedNode.val];
+//   } else {
+//     return [false, ''];
+//   }
+// }
+
+function lastWasActionInput(node: BasicFunctionNode, connections: Conn[], nodes: Node[]) {
+  const c = connections.find(conn => conn.target === node.id) || null;
+  if ((c != null) && ((getNodeById(nodes, c.source) as ActionNode).value != undefined )) {
+    const connectedNode = getNodeById(nodes, c.source) as ActionNode;
+    console.log(connectedNode.value);
+    return [true, connectedNode.value];
+  } else {
+    return [false, ''];
+  }
+}
+
+
 // recursive function to inspect next node in the flow
 function inspectNextNode(currentId: string, nodes: Node[], connections: Conn[], code: string, name: string): string {
   const conns = connections.filter(conn => conn.source === currentId);
@@ -227,12 +258,21 @@ function inspectNextNode(currentId: string, nodes: Node[], connections: Conn[], 
 
     if (connectedNode == null) {
       console.log("ERROR! No more connections");
-    } else if (connectedNode instanceof ActionNode) {
+    } else if ((connectedNode instanceof ActionNode) || (connectedNode instanceof ActionInputNode)) {
       code += `ConsumedThingAction action_${connectedNode.label} = consumedThing_${name}.getAction("${connectedNode.label}");`;
     } else if (connectedNode instanceof PropertyNode) {
       code += `ConsumedThingProperty property_${connectedNode.label} = consumedThing_${name}.getProperty("${connectedNode.label}");`;
     } else if (connectedNode.label == 'invokeAction') {
-      code += `action_${name}.invoke();`;
+      const [isActionInput, option] = lastWasActionInput(connectedNode, connections, nodes);
+      if (isActionInput) {
+        // TODO "enum" ???
+        code += `Map ${name}Input = new HashMap ();
+                 ${name}Input.put("enum", "${option}");
+                 action_${name}.invoke(${name}Input);
+      `
+      } else {
+        code += `action_${name}.invoke();`;
+      }
     } else if (connectedNode.label == 'observeProperty') {
       const [arithmetic, label] = nextIsArithmeticFunction(connectedNode, connections, nodes);
       code += `String string_${name} = property_${name}.read().get().toString();`

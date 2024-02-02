@@ -6,6 +6,7 @@ export class ActionNode extends Classic.Node {
     height = 120;
     thingId: string;
     name: string;
+    _value?: string;
     constructor(name: string, thingId: string) {
         super(name);
         this.name = name;
@@ -13,5 +14,14 @@ export class ActionNode extends Classic.Node {
         this.addInput('in', new Classic.Input(socket));
         this.addOutput('value', new Classic.Output(socket));
         return this;
+    }
+    
+    setValue(value: string){
+        this._value = value
+        console.log(this._value)
+    }
+
+    get value() : string{
+        return this._value!;
     }
 }
