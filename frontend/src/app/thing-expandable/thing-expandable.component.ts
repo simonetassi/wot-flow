@@ -54,6 +54,16 @@ export class ThingExpandableComponent implements OnInit {
   onAddActionNode(action: [string, Object], thingId: string) {
     // if input is needed, insert it from dialog
     if (Object.keys(action[1]).includes("input")) {
+      const input = (new Map(Object.entries(action[1]))).get("input");
+      // if (Object.keys(input).includes("properties")) {
+      //   const properties = new Map(Object.entries((input))).get("properties");
+      //   console.log(properties);
+      //   const map = Object.keys(properties)
+      //   // properties.forEach((value: boolean, key: string) => {
+      //   //   console.log(key, value);
+      //   // });
+
+      // }
       const dialogRef = this.dialog.open(ActionInputDialogComponent, {
         data: { value: '' },
       });

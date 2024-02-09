@@ -266,9 +266,8 @@ function inspectNextNode(currentId: string, nodes: Node[], connections: Conn[], 
     } else if (connectedNode.label == 'invokeAction') {
       const [isActionInput, option] = lastWasActionInput(connectedNode, connections, nodes);
       if (isActionInput) {
-        // TODO "enum" ???
         code += `Map ${name}Input = new HashMap ();
-                 ${name}Input.put("enum", "${option}");
+                 ${name}Input.put("input", "${option}");
                  action_${name}.invoke(${name}Input);
       `
       } else {
@@ -345,7 +344,7 @@ export function createAndroidCode(routineName: string, dataService: DataService)
     }
   }
 
-  const routine = new Routine("", routineName, code, JSON.stringify(thingIds));
+  const routine = new Routine("", routineName, code, "", JSON.stringify(thingIds));
   dataService.postRoutine(routine).subscribe(response => {
     location.reload();
   });

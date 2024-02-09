@@ -12,5 +12,8 @@ export class RoutineEntity {
     javaCode: string;
 
     @Column('text')
+    tsCode: string;
+
+    @Column('text')
     thingIds: string;
 }

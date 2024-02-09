@@ -12,5 +12,8 @@ export class RoutineDto{
     javaCode: string;
 
     @IsString()
+    tsCode: string;
+
+    @IsString()
     thingIds: string;
 }
