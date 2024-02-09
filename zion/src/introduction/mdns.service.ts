@@ -18,6 +18,7 @@ export class MulticastDnsService {
 
     const server = MDNS();
     server.on('query', (query) => {
+      console.log("mDNS request!")
       const question = query.questions.find((question) => question.name === '_directory._sub._wot');
       if (question) {
         // eslint-disable-next-line @typescript-eslint/no-non-null-assertion

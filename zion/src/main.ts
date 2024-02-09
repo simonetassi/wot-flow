@@ -3,6 +3,7 @@ import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import getApp from './app-factory';
 import { loadSwaggerExamples, loadSwaggerSchemas } from './common/swagger/global-definitions';
 import { ConfigService } from './config/config.service';
+import { MulticastDnsService } from './introduction/mdns.service';
 
 async function bootstrap() {
   const app = await getApp();
@@ -22,6 +23,8 @@ async function bootstrap() {
   SwaggerModule.setup('explorer', app, document);
 
   await app.listen(config.app.port, '0.0.0.0'); //config.app.host ???
+  const mdns = app.get(MulticastDnsService);
+  await mdns.start();
   printWelcomeMessage(config);
 }
 
