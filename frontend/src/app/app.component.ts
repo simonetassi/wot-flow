@@ -1,7 +1,7 @@
 import { AfterViewInit, Component, ElementRef, Injector, ViewChild, Renderer2, ViewContainerRef } from '@angular/core'
 
 import { createEditor } from './rete'
-import { addArithmeticFunctionNode, addBasicFunctionNode } from './rete/default'
+import { addArithmeticFunctionNode, addBasicFunctionNode, addInvokeActionNode, addObservePropertyNode } from './rete/default'
 import { ValidationAlertService } from './validation-alert/validation-alert.service'
 import { Alert } from './validation-alert/validation-alert.interface'
 import { ValidationAlertComponent } from './validation-alert/validation-alert.component'
@@ -34,6 +34,14 @@ export class AppComponent implements AfterViewInit {
 
   async ngAfterViewInit() {
     await createEditor(this.container.nativeElement, this.injector, this.validationAlertService);
+  }
+
+  onAddInvokeActionNode(){
+    addInvokeActionNode();
+  }
+
+  onAddObservePropertyNode(){
+    addObservePropertyNode();
   }
 
   onAddBasicFunctionNode(name: string) {

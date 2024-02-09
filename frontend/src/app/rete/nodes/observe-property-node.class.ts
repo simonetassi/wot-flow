@@ -1,7 +1,7 @@
 import { BasicFunctionNode } from "./basic-function-node.class";
 
-export class InvokeActionNode extends BasicFunctionNode {
+export class ObservePropertyNode extends BasicFunctionNode {
     constructor() {
-        super("observeProperty")
+        super("Observe Property")
     }
 }

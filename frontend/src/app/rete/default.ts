@@ -41,15 +41,18 @@ import { BasicFunctionNode } from './nodes/basic-function-node.class';
 import { ArithmeticFunctionNode } from './nodes/arithmetic-function-node.class';
 import { CustomDropDownComponent, CustomDropDownControl } from '../custom-dropdown/custom-dropdown.component';
 import { ActionInputNode } from './nodes/action-input-node.class';
+import { ObservePropertyNode } from './nodes/observe-property-node.class';
+import { InvokeActionNode } from './nodes/invoke-action-node.class';
 
-type Node = ThingNode | ActionNode | ActionInputNode | PropertyNode | BasicFunctionNode | ArithmeticFunctionNode;
+type Node = ThingNode | ActionNode | ActionInputNode | PropertyNode 
+          | BasicFunctionNode | ArithmeticFunctionNode | InvokeActionNode | ObservePropertyNode;
 type Conn =
   | Connection<ThingNode, PropertyNode>
   | Connection<ThingNode, ActionNode>
   | Connection<ThingNode, ActionInputNode>
-  | Connection<PropertyNode, BasicFunctionNode>
-  | Connection<ActionNode, BasicFunctionNode>
-  | Connection<ActionInputNode, BasicFunctionNode>;
+  | Connection<PropertyNode, ObservePropertyNode>
+  | Connection<ActionNode, InvokeActionNode>
+  | Connection<ActionInputNode, InvokeActionNode>;
 type Schemes = GetSchemes<Node, Conn>;
 
 class Connection<A extends Node, B extends Node> extends Classic.Connection<
@@ -162,9 +165,10 @@ function canCreateConnection(connection: Conn): boolean {
   // Thing -> Action ||  Thing -> Property
   return ((srcNode instanceof ThingNode) && ((targetNode instanceof ActionNode) || (targetNode instanceof ActionInputNode)
     || (targetNode instanceof PropertyNode)))
-    // Action -> BasicFunction || Property -> BasicFunction
-    || (((srcNode instanceof ActionNode) || (srcNode instanceof ActionInputNode) || (srcNode instanceof PropertyNode))
-      && (targetNode instanceof BasicFunctionNode))
+    // Action -> Invoke Action 
+    || (((srcNode instanceof ActionNode) || (srcNode instanceof ActionInputNode)) && (targetNode instanceof InvokeActionNode))
+    // Property -> Observe Property
+    || ((srcNode instanceof PropertyNode) && (targetNode instanceof ObservePropertyNode)) 
     // BasicFunction -> ArithmeticFunction
     || ((srcNode instanceof BasicFunctionNode) && (targetNode instanceof ArithmeticFunctionNode));
 }
@@ -189,6 +193,14 @@ export async function addActionNode(action: [string, Object], thingId: string, v
 
 export async function addPropertyNode(propertyName: string, thingId: string) {
   await editor.addNode(new PropertyNode(propertyName, thingId));
+}
+
+export async function addInvokeActionNode(){
+  await editor.addNode(new InvokeActionNode);
+}
+
+export async function addObservePropertyNode(){
+  await editor.addNode(new ObservePropertyNode);
 }
 
 export async function addBasicFunctionNode(name: string) {
@@ -263,7 +275,7 @@ function inspectNextNode(currentId: string, nodes: Node[], connections: Conn[], 
       code += `ConsumedThingAction action_${connectedNode.label} = consumedThing_${name}.getAction("${connectedNode.label}");`;
     } else if (connectedNode instanceof PropertyNode) {
       code += `ConsumedThingProperty property_${connectedNode.label} = consumedThing_${name}.getProperty("${connectedNode.label}");`;
-    } else if (connectedNode.label == 'invokeAction') {
+    } else if (connectedNode instanceof InvokeActionNode) {
       const [isActionInput, option] = lastWasActionInput(connectedNode, connections, nodes);
       if (isActionInput) {
         code += `Map ${name}Input = new HashMap ();
@@ -273,7 +285,7 @@ function inspectNextNode(currentId: string, nodes: Node[], connections: Conn[], 
       } else {
         code += `action_${name}.invoke();`;
       }
-    } else if (connectedNode.label == 'observeProperty') {
+    } else if (connectedNode instanceof ObservePropertyNode) {
       const [arithmetic, label] = nextIsArithmeticFunction(connectedNode, connections, nodes);
       code += `String string_${name} = property_${name}.read().get().toString();`
       if (arithmetic) {
