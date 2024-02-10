@@ -4,6 +4,7 @@ import { AppService } from './app.service';
 import { ConfigModule } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { RoutineModule } from './routine/routine.module';
+import { ExecuteModule } from './execute/execute.module';
 
 @Module({
   imports: [
@@ -14,7 +15,8 @@ import { RoutineModule } from './routine/routine.module';
       autoLoadEntities: true,
       synchronize: true
     }),
-    RoutineModule
+    RoutineModule,
+    ExecuteModule
   ],
   controllers: [AppController],
   providers: [AppService],
