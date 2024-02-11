@@ -296,7 +296,7 @@ function inspectNextNode(currentId: string, nodes: Node[], connections: Conn[], 
                   System.out.println("ERROR, ${name} is not a numeric property!");
                  }`;
       } else {
-        code += `properties.put("${name}", string_${name});
+        code += `results.put("${name}", string_${name});
         System.out.println(string_${name});`;
       }
     }
@@ -320,7 +320,7 @@ export function createAndroidCode(routineName: string, dataService: DataService)
   const arithmeticFunctionNodes = getArithmeticFunctionNodes(nodes);
   const thingNodes = getThingNodes(nodes);
 
-  code += `Map properties = new HashMap();`;
+  code += `Map results = new HashMap();`;
 
   if ((arithmeticFunctionNodes.length != 0) && (thingNodes.length != 0)) {
     for (let n of arithmeticFunctionNodes) {
