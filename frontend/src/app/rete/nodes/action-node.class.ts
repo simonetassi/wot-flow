@@ -6,7 +6,7 @@ export class ActionNode extends Classic.Node {
     height = 120;
     thingId: string;
     name: string;
-    _value?: string;
+    _values?: Map<string, string>;
     constructor(name: string, thingId: string) {
         super(name);
         this.name = name;
@@ -16,12 +16,12 @@ export class ActionNode extends Classic.Node {
         return this;
     }
     
-    setValue(value: string){
-        this._value = value
-        console.log(this._value)
+    setValues(values: Map<string, string>){
+        this._values = values
+        console.log(this._values)
     }
 
-    get value() : string{
-        return this._value!;
+    get values() : Map<string, string> {
+        return this._values!;
     }
 }

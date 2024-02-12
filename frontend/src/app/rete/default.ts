@@ -44,8 +44,8 @@ import { ActionInputNode } from './nodes/action-input-node.class';
 import { ObservePropertyNode } from './nodes/observe-property-node.class';
 import { InvokeActionNode } from './nodes/invoke-action-node.class';
 
-type Node = ThingNode | ActionNode | ActionInputNode | PropertyNode 
-          | BasicFunctionNode | ArithmeticFunctionNode | InvokeActionNode | ObservePropertyNode;
+type Node = ThingNode | ActionNode | ActionInputNode | PropertyNode
+  | BasicFunctionNode | ArithmeticFunctionNode | InvokeActionNode | ObservePropertyNode;
 type Conn =
   | Connection<ThingNode, PropertyNode>
   | Connection<ThingNode, ActionNode>
@@ -168,7 +168,7 @@ function canCreateConnection(connection: Conn): boolean {
     // Action -> Invoke Action 
     || (((srcNode instanceof ActionNode) || (srcNode instanceof ActionInputNode)) && (targetNode instanceof InvokeActionNode))
     // Property -> Observe Property
-    || ((srcNode instanceof PropertyNode) && (targetNode instanceof ObservePropertyNode)) 
+    || ((srcNode instanceof PropertyNode) && (targetNode instanceof ObservePropertyNode))
     // BasicFunction -> ArithmeticFunction
     || ((srcNode instanceof BasicFunctionNode) && (targetNode instanceof ArithmeticFunctionNode));
 }
@@ -179,12 +179,15 @@ export async function addThingNode(thingName: string, thingId: string) {
   await editor.addNode(new ThingNode(thingName, thingId));
 }
 
-export async function addActionNode(action: [string, Object], thingId: string, value?: string) {
-  if (Object.keys(action[1]).includes("input")) {
+export async function addActionNode(action: [string, Object], thingId: string, values?: Map<string, string>) {
+  if (Object.keys(action[1]).includes("input") || Object.keys(action[1]).includes("uriVariables")) {
     // await editor.addNode(new ActionInputNode(action, thingId));
     const n = new ActionNode(action[0], thingId);
-    n.setValue(value!);
-    n.addControl('value', new Classic.InputControl("text", { readonly: true, initial: value! }))
+    n.setValues(values!);
+
+    values!.forEach((value: string, key: string) => {
+      n.addControl(`value${key}`, new Classic.InputControl("text", { readonly: true, initial: `${key}: ${value}` }))
+    });
     await editor.addNode(n);
   } else {
     await editor.addNode(new ActionNode(action[0], thingId));
@@ -195,11 +198,11 @@ export async function addPropertyNode(propertyName: string, thingId: string) {
   await editor.addNode(new PropertyNode(propertyName, thingId));
 }
 
-export async function addInvokeActionNode(){
+export async function addInvokeActionNode() {
   await editor.addNode(new InvokeActionNode);
 }
 
-export async function addObservePropertyNode(){
+export async function addObservePropertyNode() {
   await editor.addNode(new ObservePropertyNode);
 }
 
@@ -250,14 +253,14 @@ function nextIsArithmeticFunction(node: BasicFunctionNode, connections: Conn[], 
 //   }
 // }
 
-function lastWasActionInput(node: BasicFunctionNode, connections: Conn[], nodes: Node[]) {
+function lastWasActionInput(node: BasicFunctionNode, connections: Conn[], nodes: Node[]) : [boolean, Map<string,string>]{
   const c = connections.find(conn => conn.target === node.id) || null;
-  if ((c != null) && ((getNodeById(nodes, c.source) as ActionNode).value != undefined)) {
+  if ((c != null) && ((getNodeById(nodes, c.source) as ActionNode).values != undefined)) {
     const connectedNode = getNodeById(nodes, c.source) as ActionNode;
-    console.log(connectedNode.value);
-    return [true, connectedNode.value];
+    console.log(connectedNode.values);
+    return [true, connectedNode.values];
   } else {
-    return [false, ''];
+    return [false, new Map()];
   }
 }
 
@@ -276,12 +279,13 @@ function inspectNextNode(currentId: string, nodes: Node[], connections: Conn[], 
     } else if (connectedNode instanceof PropertyNode) {
       code += `ConsumedThingProperty property_${connectedNode.label} = consumedThing_${name}.getProperty("${connectedNode.label}");`;
     } else if (connectedNode instanceof InvokeActionNode) {
-      const [isActionInput, option] = lastWasActionInput(connectedNode, connections, nodes);
+      const [isActionInput, options] = lastWasActionInput(connectedNode, connections, nodes);
       if (isActionInput) {
-        code += `Map ${name}Input = new HashMap ();
-                 ${name}Input.put("input", "${option}");
-                 action_${name}.invoke(${name}Input);
-      `
+        code += `Map ${name}Input = new HashMap ();`
+        options.forEach((value: string, key: string) => {
+          code += `${name}Input.put("${key}", "${value}");`
+        });
+        code += `action_${name}.invoke(${name}Input);`
       } else {
         code += `action_${name}.invoke();`;
       }
@@ -356,7 +360,7 @@ export function createAndroidCode(routineName: string, dataService: DataService)
     }
   }
 
-  const routine = new Routine("", routineName, code, "", JSON.stringify(thingIds));
+  const routine = new Routine("", routineName, code, " ", JSON.stringify(thingIds));
   dataService.postRoutine(routine).subscribe(response => {
     location.reload();
   });

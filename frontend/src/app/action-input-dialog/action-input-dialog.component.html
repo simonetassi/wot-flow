@@ -1,11 +1,13 @@
-<div mat-dialog-content>
-    <p>Insert action parameter</p>
-    <mat-form-field>
-        <mat-label>Parameter</mat-label>
-        <input matInput cdkFocusInitial [(ngModel)]="data.value" required minlength="1">
-    </mat-form-field>
+<div mat-dialog-content id="dialog-content">
+    <p>Insert action parameters</p>
+    <ng-container *ngFor="let input of data.inputs">
+        <mat-form-field>
+            <mat-label>{{ input }}</mat-label>
+            <input matInput required minlength="1" [(ngModel)]="data.values[input]">
+        </mat-form-field>
+    </ng-container>
 </div>
 <div mat-dialog-actions align="end">
     <button mat-button (click)="onNoClick()">Cancel</button>
-    <button mat-button color="primary" [mat-dialog-close]="data.value" [disabled]="!data.value">Save</button>
+    <button mat-button color="primary" [mat-dialog-close]="data.values" [disabled]="!isFormValid()">Save</button>
 </div>

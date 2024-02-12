@@ -4,13 +4,11 @@ import {
   MAT_DIALOG_DATA,
   MatDialogRef
 } from '@angular/material/dialog';
-import { addActionNode, createAndroidCode } from '../rete/default';
-import { editorIsEmpty } from '../rete/default';
-import { DataService } from '../data.service';
 
 
 export interface DialogData {
-  value: string;
+  values: { [key: string]: string };
+  inputs: string[];
 }
 
 @Component({
@@ -26,5 +24,9 @@ export class ActionInputDialogComponent {
 
   onNoClick(): void {
     this.dialogRef.close();
+  }
+
+  isFormValid(): boolean {
+    return this.data.inputs.every(input => !!this.data.inputs);
   }
 }
