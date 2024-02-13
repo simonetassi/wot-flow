@@ -174,7 +174,7 @@ function canCreateConnection(connection: Conn): boolean {
 }
 
 
-// add node function (for sidebar buttons)
+// add node functions (for sidebar buttons)
 export async function addThingNode(thingName: string, thingId: string) {
   await editor.addNode(new ThingNode(thingName, thingId));
 }
@@ -360,7 +360,7 @@ export function createAndroidCode(routineName: string, dataService: DataService)
     }
   }
 
-  const routine = new Routine("", routineName, code, " ", JSON.stringify(thingIds));
+  const routine = new Routine("", routineName, code, "", JSON.stringify(thingIds));
   dataService.postRoutine(routine).subscribe(response => {
     location.reload();
   });

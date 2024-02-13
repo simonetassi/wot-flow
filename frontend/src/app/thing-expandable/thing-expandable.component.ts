@@ -52,56 +52,39 @@ export class ThingExpandableComponent implements OnInit {
   }
 
   onAddActionNode(action: [string, Object], thingId: string) {
-    // if input is needed, insert it from dialog
+    let keys: string[] = [];
+  
     if (Object.keys(action[1]).includes("input")) {
-      // input case
-      const input = (new Map(Object.entries(action[1]))).get("input");
-      // if (Object.keys(input).includes("properties")) {
-      //   const properties = new Map(Object.entries((input))).get("properties");
-      //   console.log(properties);
-      //   const map = Object.keys(properties)
-      //   // properties.forEach((value: boolean, key: string) => {
-      //   //   console.log(key, value);
-      //   // });
-
-      // }
-      const values: { [key: string]: string } = {};
-      values["input"] = '';
-      const dialogRef = this.dialog.open(ActionInputDialogComponent, {
-        data: { values: values, inputs: ["input"] },
-      });
-
-      dialogRef.afterClosed().subscribe(result => {
-        if (result) {
-          console.log(result);
-          const results: Map<string, string> = new Map(Object.entries(result))
-          addActionNode(action, thingId, results);
-        }
-      });
+      const input = (action[1] as any).input;
+      keys = input && input.properties ? Object.keys(input.properties) : ["input"];
     } else if (Object.keys(action[1]).includes("uriVariables")) {
-      // uriVariables case
-      const uriVariables = (new Map(Object.entries(action[1]))).get("uriVariables");
-      const values: { [key: string]: string } = {};
-      // Initialize the values object with empty strings for each input
-      Object.keys(uriVariables).forEach(input => {
-        values[input] = '';
-      });
-      const dialogRef = this.dialog.open(ActionInputDialogComponent, {
-        data: { values: values, inputs: Object.keys(uriVariables) },
-      });
-
-      dialogRef.afterClosed().subscribe(result => {
-        if (result) {
-          console.log(result);
-          const results: Map<string, string> = new Map(Object.entries(result))
-          addActionNode(action, thingId, results);
-        }
-      });
+      keys = Object.keys((action[1] as any).uriVariables);
+    }
+  
+    if (keys.length > 0) {
+      this.openInputDialog(keys, action, thingId);
     } else {
-      // Call the addActionNode function from createEditor
       addActionNode(action, thingId);
     }
   }
+  
+  openInputDialog(keys: string[], action: [string, Object], thingId: string) {
+    const values: { [key: string]: string } = {};
+    keys.forEach(key => values[key] = '');
+  
+    const dialogRef = this.dialog.open(ActionInputDialogComponent, {
+      data: { values: values, inputs: keys },
+    });
+  
+    dialogRef.afterClosed().subscribe(result => {
+      if (result) {
+        const results: Map<string, string> = new Map(Object.entries(result));
+        addActionNode(action, thingId, results);
+      }
+    });
+  }
+  
+  
 
   onAddPropertyNode(propertyName: string, thingId: string) {
     // Call the addPropertyNode function from createEditor
